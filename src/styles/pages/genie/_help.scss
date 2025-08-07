@@ -1,0 +1,217 @@
+.genie__help_settings {
+  padding: 40px 0 30px;
+  width: 100%;
+}
+.Genie__help {
+  //faq starts
+  &__faq {
+    &-title {
+      display: block;
+      background: $gen-gradient-primary-reverse;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-family: $gen-poppins-semi-bold;
+      font-size: 40px;
+      text-align: center;
+    }
+    &-subtitle {
+      font-size: $font-xsm;
+      color: $gen-primary-grey;
+      text-align: center;
+      font-family: $gen-poppins-light;
+    }
+    .genie-prompt-wrapper {
+      margin: 20px 0;
+    }
+    &-section {
+      margin-top: 30px;
+    }
+    &-item {
+      &:hover {
+        box-shadow: 0 4px 12px $gen-shadow-black-light;
+      }
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border: 1px solid $borderColor;
+      transition: all 0.3s ease;
+      padding: 15px 19px 13px;
+      background-color: $gen-white;
+      cursor: pointer;
+      &-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      &-list-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        cursor: pointer;
+        p {
+          font-family: $gen-poppins-medium;
+          font-size: $font-xsm;
+          margin-bottom: 0;
+        }
+      }
+      &-details {
+        font-size: $font-xs;
+        padding-top: 15px;
+        margin-left: 15px;
+        width: 85%;
+        line-height: 24px;
+        color: $gen-primary-grey;
+      }
+    }
+  }
+  //fqa ends
+
+  //release-note start
+  &__release-notes {
+    &-header {
+      margin-bottom: 40px;
+    }
+    &__container {
+      display: flex;
+      gap: 40px;
+      margin-top: 20px;
+    }
+    &__sidebar {
+      width: 320px;
+      flex-shrink: 0;
+      border: 1px solid $borderColor;
+      box-shadow: 0 0 5px $gen-shadow-black-light;
+      border-radius: 10px;
+      padding: 19px;
+      background-color: $gen-white;
+    }
+    &-card {
+      position: relative;
+      &__title {
+        font-size: $font-sm;
+        font-family: $gen-poppins-medium;
+        padding-left: 16px;
+      }
+      &__content {
+        margin: 19px 0;
+        .Genie__help__release-item__title {
+          cursor: pointer;
+          padding: 2px 17px;
+          margin: 15px 0;
+          font-size: $font-xs;
+        }
+      }
+    }
+    .Genie__help__release-item {
+      &--active,
+      &__title:hover {
+        background: $gen-gradient-hover;
+        border-radius: 10px;
+      }
+    }
+    &__main {
+      flex: 1;
+      margin: 60px 0;
+      .Genie__help__release-content {
+        &__version {
+          font-family: $gen-poppins-medium;
+          font-size: $font-sm;
+        }
+        &__date {
+          font-size: $font-xs;
+          margin-bottom: 10px;
+        }
+        &__body {
+          padding: 20px 0 20px 20px;
+        }
+        &__section-title {
+          font-size: $font-xsm;
+          font-family: $gen-poppins-medium;
+        }
+        &__fixes {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+          margin: 15px 15px 35px;
+        }
+        .Genie__help__fix {
+          &-item {
+            display: flex;
+            gap: 10px;
+            align-items: baseline;
+          }
+          &-item {
+            &__bullet {
+              flex-shrink: 0;
+            }
+            &__dot {
+              width: 5px;
+              height: 5px;
+              background-color: $gen-primary-grey;
+              border-radius: 50%;
+            }
+            &__description {
+              color: $gen-primary-grey;
+              line-height: 21px;
+              font-size: $font-xs;
+            }
+            p {
+              margin: 0;
+            }
+          }
+          &__content {
+            flex: 1;
+          }
+        }
+      }
+    }
+  }
+  //release-note end
+
+  // shortcuts start
+  &__shortcuts {
+    &__header {
+      margin-bottom: 40px;
+    }
+    &-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 25px 50px;
+      max-width: 770px;
+      margin: 30px auto;
+      border: 1px solid $borderColor;
+      box-shadow: 0 0 5px $gen-shadow-black-light;
+      border-radius: 10px;
+      padding: 19px;
+      background-color: $gen-white;
+    }
+    &-item {
+      display: flex;
+      box-sizing: border-box;
+      transform: none;
+      margin-bottom: 15px;
+      gap: 10px;
+      &-action {
+        font-size: $font-xs;
+        font-family: $gen-poppins-medium;
+        width: 145px;
+      }
+      &-keys {
+        display: flex;
+        gap: 10px;
+      }
+      &-key {
+        border: 1px solid $borderColor;
+        padding: 3px 5px;
+        color: $gen-link-blue;
+        text-align: center;
+        font-size: $font-xs;
+        font-family: $gen-poppins-medium;
+        width: 45px;
+        height: 32px;
+      }
+    }
+  }
+  // shortcuts end
+}

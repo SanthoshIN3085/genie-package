@@ -1,0 +1,111 @@
+$gen-boder: #c0cee2;
+$gen-box-shadow: rgba(0, 0, 0, 0.1);
+$font-subtitle: 13px;
+$mt: 20px;
+
+.settings {
+  &__main {
+    &__content {
+      margin: $mt 0;
+      .billing-card {
+        .billing-tag {
+          .price {
+            font-size: $font-md;
+            font-family: $gen-poppins-semi-bold;
+          }
+          .period {
+            font-size: $font-xs;
+          }
+        }
+        .billing-token-usage {
+          font-size: $font-subtitle;
+          margin-bottom: $mt;
+        }
+        ul li {
+          padding-left: 15px;
+          font-size: $font-xs;
+          margin-bottom: 10px;
+        }
+      }
+      .payment-card {
+        .header {
+          font-size: $font-xs;
+          font-family: $gen-poppins-medium;
+        }
+        .card-details {
+          display: flex;
+          justify-content: space-between;
+          margin-top: $mt;
+          border-bottom: 1px solid $gen-boder;
+          padding-bottom: 10px;
+          &:last-child {
+            border-bottom: none;
+          }
+          .name {
+            font-size: $font-xs;
+            color: $gen-primary-black;
+          }
+          .date {
+            font-size: $font-subtitle;
+          }
+          .btn {
+            padding: 4px 7px;
+            font-size: 11px;
+            background: linear-gradient(45deg, #2460f4 0%, #5a23ee 100%);
+            color: #ffffff;
+            cursor: pointer;
+            border-radius: 12px;
+            font-family: "PoppinsMedium", sans-serif;
+            transition: all 0.3s ease;
+            display: block;
+            white-space: nowrap;
+            height: 27px;
+            &.default {
+              opacity: 0.6;
+            }
+            &.set-as-default {
+              background: $gen-tertiary-grey;
+              color: $gen-secondary-black;
+            }
+          }
+        }
+      }
+      .amount-details {
+        .header {
+          font-size: $font-xs;
+          font-family: $gen-poppins-medium;
+        }
+        .number-input {
+          border: 1px solid $gen-boder;
+          padding: 10px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          margin: $mt 0;
+        }
+        .amount-dec {
+          font-size: $font-subtitle;
+        }
+      }
+      .billing-progress {
+        small {
+          font-size: $font-subtitle;
+        }
+        .token-dashboard__progress {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          span {
+            font-family: $gen-poppins-medium;
+          }
+        }
+      }
+    }
+  }
+}
+
+.settings__main-2 {
+  .settings__main__content {
+    margin: 0;
+  }
+}

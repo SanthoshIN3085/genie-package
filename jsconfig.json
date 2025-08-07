@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "Assets/*": ["src/assets/*"],
+      "Components/*": ["src/components/*"],
+      "Constants/*": ["src/constants/*"],
+      "Hooks/*": ["src/hooks/*"],
+      "Styles/*": ["src/styles/*"],
+      "Server/*": ["src/server/*"],
+      "Store/*": ["src/store/*"],
+      "Utils/*": ["src/Utils/*"],
+      "Pages/*": ["src/pages/*"],
+      "Reducers/*": ["src/Reducers/*"],
+      "Hoc/*": ["src/Hoc/*"]
+    },
+    "forceConsistentCasingInFileNames": false
+  },
+  "exclude": ["node_modules", "dist"]
+}

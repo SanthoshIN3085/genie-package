@@ -1,0 +1,642 @@
+// =============================================================================
+// RESPONSIVE FOUNDATION
+// =============================================================================
+
+// Breakpoint Variables
+// Mobile-first approach with industry standard breakpoints
+$breakpoints: (
+  xs: 0,
+  // Extra small devices (phones)
+  sm: 576px,
+  // Small devices (landscape phones)
+  md: 768px,
+  // Medium devices (tablets)
+  lg: 992px,
+  // Large devices (desktops)
+  xl: 1200px,
+  // Extra large devices (large desktops)
+  xxl: 1400px,
+  // Extra extra large devices
+  xxxl: 1600px,
+  // Ultra wide screens
+  tv: 1920px // TV and large displays,,
+);
+
+// Container max-widths for different breakpoints
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1320px,
+  xxxl: 1500px,
+  tv: 1800px,
+);
+
+// Responsive Typography Scale
+$font-sizes: (
+  xs: (
+    base: 14px,
+    h1: 24px,
+    h2: 20px,
+    h3: 18px,
+    h4: 16px,
+    h5: 14px,
+    h6: 12px,
+    small: 12px,
+    large: 16px,
+  ),
+  sm: (
+    base: 15px,
+    h1: 28px,
+    h2: 24px,
+    h3: 20px,
+    h4: 18px,
+    h5: 16px,
+    h6: 14px,
+    small: 13px,
+    large: 18px,
+  ),
+  md: (
+    base: 16px,
+    h1: 32px,
+    h2: 28px,
+    h3: 24px,
+    h4: 20px,
+    h5: 18px,
+    h6: 16px,
+    small: 14px,
+    large: 20px,
+  ),
+  lg: (
+    base: 16px,
+    h1: 36px,
+    h2: 32px,
+    h3: 28px,
+    h4: 24px,
+    h5: 20px,
+    h6: 18px,
+    small: 14px,
+    large: 22px,
+  ),
+  xl: (
+    base: 18px,
+    h1: 42px,
+    h2: 36px,
+    h3: 32px,
+    h4: 28px,
+    h5: 24px,
+    h6: 20px,
+    small: 16px,
+    large: 24px,
+  ),
+  xxl: (
+    base: 18px,
+    h1: 48px,
+    h2: 42px,
+    h3: 36px,
+    h4: 32px,
+    h5: 28px,
+    h6: 24px,
+    small: 16px,
+    large: 26px,
+  ),
+  xxxl: (
+    base: 20px,
+    h1: 54px,
+    h2: 48px,
+    h3: 42px,
+    h4: 36px,
+    h5: 32px,
+    h6: 28px,
+    small: 18px,
+    large: 28px,
+  ),
+  tv: (
+    base: 22px,
+    h1: 60px,
+    h2: 54px,
+    h3: 48px,
+    h4: 42px,
+    h5: 36px,
+    h6: 32px,
+    small: 20px,
+    large: 30px,
+  ),
+);
+
+// Responsive Spacing Scale
+$spacing: (
+  xs: (
+    xs: 4px,
+    sm: 8px,
+    md: 12px,
+    lg: 16px,
+    xl: 20px,
+    xxl: 24px,
+    xxxl: 32px,
+  ),
+  sm: (
+    xs: 6px,
+    sm: 12px,
+    md: 16px,
+    lg: 20px,
+    xl: 24px,
+    xxl: 28px,
+    xxxl: 36px,
+  ),
+  md: (
+    xs: 8px,
+    sm: 16px,
+    md: 20px,
+    lg: 24px,
+    xl: 28px,
+    xxl: 32px,
+    xxxl: 40px,
+  ),
+  lg: (
+    xs: 10px,
+    sm: 20px,
+    md: 24px,
+    lg: 28px,
+    xl: 32px,
+    xxl: 36px,
+    xxxl: 44px,
+  ),
+  xl: (
+    xs: 12px,
+    sm: 24px,
+    md: 28px,
+    lg: 32px,
+    xl: 36px,
+    xxl: 40px,
+    xxxl: 48px,
+  ),
+  xxl: (
+    xs: 14px,
+    sm: 28px,
+    md: 32px,
+    lg: 36px,
+    xl: 40px,
+    xxl: 44px,
+    xxxl: 52px,
+  ),
+  xxxl: (
+    xs: 16px,
+    sm: 32px,
+    md: 36px,
+    lg: 40px,
+    xl: 44px,
+    xxl: 48px,
+    xxxl: 56px,
+  ),
+  tv: (
+    xs: 18px,
+    sm: 36px,
+    md: 40px,
+    lg: 44px,
+    xl: 48px,
+    xxl: 52px,
+    xxxl: 60px,
+  ),
+);
+
+// Touch Target Sizes (minimum 44px for accessibility)
+$touch-targets: (
+  xs: 44px,
+  sm: 48px,
+  md: 52px,
+  lg: 56px,
+  xl: 60px,
+);
+
+// =============================================================================
+// RESPONSIVE MIXINS
+// =============================================================================
+
+// Media Query Mixin
+@mixin respond-to($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    $value: map-get($breakpoints, $breakpoint);
+    @if $value == 0 {
+      @content;
+    } @else {
+      @media (min-width: $value) {
+        @content;
+      }
+    }
+  } @else {
+    @warn "Unknown breakpoint: #{$breakpoint}";
+  }
+}
+
+// Max-width Media Query Mixin
+@mixin respond-to-max($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    $value: map-get($breakpoints, $breakpoint);
+    @media (max-width: ( $value - 1px)) {
+      @content;
+    }
+  } @else {
+    @warn "Unknown breakpoint: #{$breakpoint}";
+  }
+}
+
+// Range Media Query Mixin
+@mixin respond-to-range($min, $max) {
+  $min-value: map-get($breakpoints, $min);
+  $max-value: map-get($breakpoints, $max);
+  @media (min-width: $min-value) and (max-width: ($max-value - 1px)) {
+    @content;
+  }
+}
+
+// Container Mixin
+@mixin container($max-width: null) {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: map-get($spacing, xs, md);
+  padding-right: map-get($spacing, xs, md);
+
+  @if $max-width {
+    max-width: $max-width;
+  }
+
+  @include respond-to(sm) {
+    padding-left: map-get($spacing, sm, md);
+    padding-right: map-get($spacing, sm, md);
+  }
+
+  @include respond-to(md) {
+    padding-left: map-get($spacing, md, md);
+    padding-right: map-get($spacing, md, md);
+  }
+
+  @include respond-to(lg) {
+    padding-left: map-get($spacing, lg, md);
+    padding-right: map-get($spacing, lg, md);
+  }
+}
+
+// Responsive Typography Mixin
+@mixin responsive-font($size, $line-height: 1.4) {
+  @each $breakpoint, $sizes in $font-sizes {
+    @include respond-to($breakpoint) {
+      font-size: map-get($sizes, $size);
+      line-height: $line-height;
+    }
+  }
+}
+
+// Responsive Spacing Mixin
+@mixin responsive-spacing($property, $size) {
+  @each $breakpoint, $spacings in $spacing {
+    @include respond-to($breakpoint) {
+      #{$property}: map-get($spacings, $size);
+    }
+  }
+}
+
+// Touch Target Mixin
+@mixin touch-target($size: md) {
+  min-width: map-get($touch-targets, $size);
+  min-height: map-get($touch-targets, $size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// =============================================================================
+// RESPONSIVE UTILITIES
+// =============================================================================
+
+// Responsive Display Classes
+@each $breakpoint, $value in $breakpoints {
+  @include respond-to($breakpoint) {
+    .d-#{$breakpoint}-none {
+      display: none !important;
+    }
+    .d-#{$breakpoint}-inline {
+      display: inline !important;
+    }
+    .d-#{$breakpoint}-inline-block {
+      display: inline-block !important;
+    }
+    .d-#{$breakpoint}-block {
+      display: block !important;
+    }
+    .d-#{$breakpoint}-flex {
+      display: flex !important;
+    }
+    .d-#{$breakpoint}-inline-flex {
+      display: inline-flex !important;
+    }
+    .d-#{$breakpoint}-grid {
+      display: grid !important;
+    }
+  }
+}
+
+// Responsive Flex Utilities
+@each $breakpoint, $value in $breakpoints {
+  @include respond-to($breakpoint) {
+    .flex-#{$breakpoint}-row {
+      flex-direction: row !important;
+    }
+    .flex-#{$breakpoint}-column {
+      flex-direction: column !important;
+    }
+    .flex-#{$breakpoint}-wrap {
+      flex-wrap: wrap !important;
+    }
+    .flex-#{$breakpoint}-nowrap {
+      flex-wrap: nowrap !important;
+    }
+    .justify-#{$breakpoint}-start {
+      justify-content: flex-start !important;
+    }
+    .justify-#{$breakpoint}-end {
+      justify-content: flex-end !important;
+    }
+    .justify-#{$breakpoint}-center {
+      justify-content: center !important;
+    }
+    .justify-#{$breakpoint}-between {
+      justify-content: space-between !important;
+    }
+    .justify-#{$breakpoint}-around {
+      justify-content: space-around !important;
+    }
+    .align-#{$breakpoint}-start {
+      align-items: flex-start !important;
+    }
+    .align-#{$breakpoint}-end {
+      align-items: flex-end !important;
+    }
+    .align-#{$breakpoint}-center {
+      align-items: center !important;
+    }
+    .align-#{$breakpoint}-baseline {
+      align-items: baseline !important;
+    }
+    .align-#{$breakpoint}-stretch {
+      align-items: stretch !important;
+    }
+  }
+}
+
+// Responsive Text Alignment
+@each $breakpoint, $value in $breakpoints {
+  @include respond-to($breakpoint) {
+    .text-#{$breakpoint}-left {
+      text-align: left !important;
+    }
+    .text-#{$breakpoint}-right {
+      text-align: right !important;
+    }
+    .text-#{$breakpoint}-center {
+      text-align: center !important;
+    }
+    .text-#{$breakpoint}-justify {
+      text-align: justify !important;
+    }
+  }
+}
+
+// Responsive Spacing Utilities
+@each $breakpoint, $value in $breakpoints {
+  @include respond-to($breakpoint) {
+    .m-#{$breakpoint}-0 {
+      margin: 0 !important;
+    }
+    .mt-#{$breakpoint}-0 {
+      margin-top: 0 !important;
+    }
+    .mr-#{$breakpoint}-0 {
+      margin-right: 0 !important;
+    }
+    .mb-#{$breakpoint}-0 {
+      margin-bottom: 0 !important;
+    }
+    .ml-#{$breakpoint}-0 {
+      margin-left: 0 !important;
+    }
+    .mx-#{$breakpoint}-0 {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+    .my-#{$breakpoint}-0 {
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+
+    .p-#{$breakpoint}-0 {
+      padding: 0 !important;
+    }
+    .pt-#{$breakpoint}-0 {
+      padding-top: 0 !important;
+    }
+    .pr-#{$breakpoint}-0 {
+      padding-right: 0 !important;
+    }
+    .pb-#{$breakpoint}-0 {
+      padding-bottom: 0 !important;
+    }
+    .pl-#{$breakpoint}-0 {
+      padding-left: 0 !important;
+    }
+    .px-#{$breakpoint}-0 {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+    .py-#{$breakpoint}-0 {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+  }
+}
+
+// =============================================================================
+// RESPONSIVE GRID SYSTEM
+// =============================================================================
+
+// Grid Container
+.genie-grid {
+  display: grid;
+  gap: map-get($spacing, xs, md);
+
+  @include respond-to(sm) {
+    gap: map-get($spacing, sm, md);
+  }
+
+  @include respond-to(md) {
+    gap: map-get($spacing, md, md);
+  }
+
+  @include respond-to(lg) {
+    gap: map-get($spacing, lg, md);
+  }
+}
+
+// Responsive Grid Columns
+@for $i from 1 through 12 {
+  .genie-col-#{$i} {
+    grid-column: span $i;
+  }
+
+  @each $breakpoint, $value in $breakpoints {
+    @include respond-to($breakpoint) {
+      .genie-col-#{$breakpoint}-#{$i} {
+        grid-column: span $i;
+      }
+    }
+  }
+}
+
+// Auto-fit Grid
+.genie-grid-auto-fit {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.genie-grid-auto-fill {
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+// =============================================================================
+// RESPONSIVE LAYOUT HELPERS
+// =============================================================================
+
+// Mobile-first responsive container
+.genie-container {
+  @include container();
+
+  @each $breakpoint, $max-width in $container-max-widths {
+    @include respond-to($breakpoint) {
+      max-width: $max-width;
+    }
+  }
+}
+
+// Responsive aspect ratio
+.genie-aspect-ratio {
+  position: relative;
+  width: 100%;
+
+  &::before {
+    content: "";
+    display: block;
+    padding-bottom: 56.25%; // 16:9 aspect ratio
+  }
+
+  > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// Responsive image
+.genie-img-responsive {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+// Responsive table
+.genie-table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  table {
+    min-width: 600px;
+  }
+}
+
+// =============================================================================
+// RESPONSIVE NAVIGATION HELPERS
+// =============================================================================
+
+// Mobile menu toggle
+.genie-mobile-menu-toggle {
+  display: block;
+
+  @include respond-to(lg) {
+    display: none;
+  }
+}
+
+// Desktop navigation
+.genie-desktop-nav {
+  display: none;
+
+  @include respond-to(lg) {
+    display: flex;
+  }
+}
+
+// Mobile navigation
+.genie-mobile-nav {
+  display: block;
+
+  @include respond-to(lg) {
+    display: none;
+  }
+}
+
+// =============================================================================
+// RESPONSIVE FORM HELPERS
+// =============================================================================
+
+// Responsive form layout
+.genie-form-responsive {
+  .form-group {
+    margin-bottom: map-get($spacing, xs, lg);
+
+    @include respond-to(md) {
+      margin-bottom: map-get($spacing, md, lg);
+    }
+  }
+
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: map-get($spacing, xs, md);
+
+    @include respond-to(md) {
+      flex-direction: row;
+      gap: map-get($spacing, md, md);
+    }
+  }
+}
+
+// =============================================================================
+// RESPONSIVE MODAL HELPERS
+// =============================================================================
+
+// Responsive modal
+.genie-modal-responsive {
+  margin: map-get($spacing, xs, lg);
+  max-width: calc(100vw - #{map-get($spacing, xs, lg) * 2});
+  max-height: calc(100vh - #{map-get($spacing, xs, lg) * 2});
+
+  @include respond-to(sm) {
+    margin: map-get($spacing, sm, lg);
+    max-width: calc(100vw - #{map-get($spacing, sm, lg) * 2});
+    max-height: calc(100vh - #{map-get($spacing, sm, lg) * 2});
+  }
+
+  @include respond-to(md) {
+    margin: map-get($spacing, md, lg);
+    max-width: 500px;
+    max-height: calc(100vh - #{map-get($spacing, md, lg) * 2});
+  }
+
+  @include respond-to(lg) {
+    margin: map-get($spacing, lg, lg);
+    max-width: 600px;
+    max-height: calc(100vh - #{map-get($spacing, lg, lg) * 2});
+  }
+}

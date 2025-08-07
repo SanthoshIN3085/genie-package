@@ -1,0 +1,408 @@
+// Neutral Colors
+$color-white: var(--theme-bg);
+$color-black: var(--theme-inner);
+$color-gray-100: #f4f4f4;
+$color-gray-200: #e9e9e9;
+$color-gray-300: var(--theme-placeholder);
+$color-gray-400: #999999;
+$color-gray-500: #666666;
+$color-gray-600: var(--theme-font5);
+$color-gray-700: var(--theme-font1);
+
+// Blue Colors
+$color-blue-50: #f0f8ff;
+$color-blue-100: #c2cfe3;
+$color-blue-200: #c0cee2;
+$color-blue-300: #1f8cf4;
+$color-blue-400: #2c86f7;
+$color-blue-500: #0043ff;
+$color-blue-600: #0000ff;
+$color-blue-700: #4464ed;
+$color-blue-800: #493beb;
+$color-blue-900: #2460f4;
+$color-blue-950: #5a23ee;
+
+// Purple Colors
+$color-purple-100: #e3e6f7;
+$color-purple-200: #d9c9e8;
+$color-purple-300: var(--theme-chat_boder);
+$color-purple-400: #4a40f5;
+$color-purple-500: #5a18f3;
+$color-purple-600: #5a23ee;
+
+// Orange Colors
+$color-orange-100: #ffede1;
+$color-orange-200: #ffebeb;
+$color-orange-300: #ffb900;
+$color-orange-400: #fd8f40;
+$color-orange-500: #fc6a00;
+$color-orange-600: #ff6d00;
+
+// Red Colors
+$color-red-100: #ffede1;
+$color-red-200: #ffebeb;
+$color-red-300: #ff3939;
+
+// Green Colors
+$color-green-100: #99cc03;
+$color-green-200: #5ba529;
+$color-green-300: #379904;
+$gen-green-light: #aed237;
+
+// Status Colors
+$color-status-draft: #b8b8b8;
+$color-status-completed: #379904;
+$color-status-scheduled: #f58332;
+$color-status-inprogress: #26ade0;
+$color-status-alert: #e5c553;
+$color-status-multi: #9b5faa;
+$color-status-pause: #a3cccc;
+$color-status-play: #99cc03;
+$color-status-stop: #ef4c4e;
+
+// =============================================================================
+// SEMANTIC COLORS (Meaning-based color assignments)
+// =============================================================================
+
+// Text Colors
+$color-text-primary: $color-gray-700;
+$color-text-secondary: $color-gray-600;
+$color-text-tertiary: $color-gray-500;
+$color-text-quaternary: $color-gray-400;
+$color-text-placeholder: $color-gray-300;
+$color-text-link: $color-blue-300;
+$color-text-active: $color-blue-400;
+$color-text-success: $color-green-200;
+$color-text-warning: $color-orange-500;
+$color-text-error: $color-red-300;
+
+// Background Colors
+$color-bg-primary: $color-white;
+$color-bg-secondary: $color-gray-100;
+$color-bg-tertiary: $color-gray-200;
+$color-bg-hover: #f8f9fa;
+$color-bg-light-blue: #f5f5ff;
+$color-bg-transparent: var(--theme-chat_bg);
+$color-bg-light-blue-transparent: rgb(240 249 255);
+
+// Border Colors
+$color-border-primary: $color-blue-200;
+$color-border-secondary: $color-gray-200;
+$color-border-tertiary: $color-purple-300;
+$color-border-divider: #ced0d1;
+$color-border-divider-light: $color-purple-100;
+$color-border-purple-light: $color-purple-200;
+$color-border-blue-transparent: rgba(34, 156, 250, 0.5);
+
+// Shadow Colors
+$color-shadow-light: rgba(0, 0, 0, 0.1);
+$color-shadow-medium: rgba(0, 0, 0, 0.15);
+$color-shadow-strong: rgba(0, 0, 0, 0.2);
+$color-shadow-blue-light: rgba(35, 156, 248, 0.1);
+$color-shadow-blue-medium: rgba(0, 0, 0, 0.12);
+$color-shadow-blue-strong: rgba(0, 0, 0, 0.08);
+$color-shadow-purple: rgba(90, 24, 245, 0.1);
+$color-shadow-purple-hover: $color-purple-400;
+$color-shadow-box: #0000001a;
+
+// =============================================================================
+// GRADIENT COLORS (Individual gradient color stops)
+// =============================================================================
+
+// Primary Gradient Colors
+$gradient-blue-primary: $color-blue-700;
+$gradient-blue-secondary: $color-blue-800;
+$gradient-blue-active: $color-blue-900;
+$gradient-purple-active: $color-purple-600;
+
+// Transparent Gradient Colors
+$gradient-blue-transparent-light: rgba(35, 156, 248, 0.1);
+$gradient-purple-transparent-light: rgba(90, 24, 243, 0.1);
+$gradient-blue-transparent-medium: rgba(35, 156, 248, 0.15);
+$gradient-purple-transparent-medium: rgba(90, 24, 243, 0.15);
+$gradient-blue-transparent-strong: rgba(35, 156, 248, 0.2);
+$gradient-purple-transparent-strong: rgba(90, 24, 243, 0.2);
+
+// Tab Gradient Colors
+$gradient-tab-blue: rgba(178, 219, 250, 0.62);
+$gradient-tab-purple: rgba(220, 210, 243, 0.69);
+
+// =============================================================================
+// GRADIENT DEFINITIONS (Complete gradient functions)
+// =============================================================================
+
+// Primary Gradients
+$gradient-primary: linear-gradient(
+  45deg,
+  $gradient-blue-primary,
+  $gradient-blue-secondary
+);
+$gradient-primary-reverse: linear-gradient(
+  to right,
+  $gradient-blue-primary,
+  $gradient-blue-secondary
+);
+$gradient-active: linear-gradient(
+  90deg,
+  $gradient-blue-active 0%,
+  $gradient-purple-active 100%
+);
+$gradient-primary-btn: linear-gradient(
+  45deg,
+  $color-blue-900 0%,
+  $color-blue-950 100%
+);
+
+// Interactive Gradients
+$gradient-hover: linear-gradient(
+  45deg,
+  $gradient-blue-transparent-light 0%,
+  $gradient-purple-transparent-light 100%
+);
+$gradient-hover-strong: linear-gradient(
+  45deg,
+  $gradient-blue-transparent-strong 0%,
+  $gradient-purple-transparent-strong 100%
+);
+$gradient-working: linear-gradient(
+  to left,
+  $gradient-purple-transparent-medium,
+  $gradient-blue-transparent-medium
+);
+
+// Special Gradients
+$gradient-tab: linear-gradient(
+  to right,
+  $gradient-tab-blue,
+  $gradient-tab-purple
+);
+$gradient-animated: linear-gradient(
+  to right,
+  $gradient-blue-primary,
+  $color-white,
+  $gradient-blue-secondary,
+  $color-white,
+  $gradient-blue-primary
+);
+
+// =============================================================================
+// COMPONENT COLORS (Usage-based color assignments)
+// =============================================================================
+
+// Sidenav Component
+$component-sidenav-bg: $color-bg-primary;
+$component-sidenav-border: $color-border-primary;
+$component-sidenav-hover: $color-bg-hover;
+$component-sidenav-active: $color-text-active;
+$component-sidenav-divider: $color-border-secondary;
+
+// Search Component
+$component-search-border: $color-border-primary;
+$component-search-divider: $color-blue-300;
+
+// Settings Component
+$component-settings-progress: $color-orange-600;
+$component-settings-link: $color-text-link;
+$component-settings-divider: $color-border-divider-light;
+$component-settings-slider-bg: $color-bg-light-blue;
+$component-settings-slider-thumb: $color-white;
+$component-settings-toggle-inactive: $color-border-divider-light;
+$component-settings-toggle-active: $gradient-active;
+
+// ChatBox Component
+$component-chatbox-border: $color-border-tertiary;
+$component-chatbox-bg: $color-bg-transparent;
+$component-chatbox-bubble-bg: $color-bg-light-blue-transparent;
+$component-chatbox-divider: $color-border-divider;
+$component-chatbox-divider-light: $color-border-purple-light;
+
+// Welcome Component
+$component-welcome-shadow: $color-shadow-purple-hover;
+
+// PromptBox Component
+$component-promptbox-border: $color-border-tertiary;
+$component-promptbox-divider: $color-border-blue-transparent;
+
+// Workings Component
+$component-workings-shadow: $color-shadow-light;
+$component-workings-border: $color-border-primary;
+
+// Help Component
+$component-help-shadow: $color-shadow-box;
+
+// Gallery Component
+$component-gallery-shadow: $color-shadow-purple-hover;
+
+// =============================================================================
+// LEGACY ALIASES (Backward compatibility - deprecated)
+// =============================================================================
+
+// Core Legacy Colors
+$gen-white: $color-white;
+$gen-black: $color-black;
+$gen-primary-black: $color-gray-700;
+$gen-secondary-black: $color-gray-600;
+$gen-primary-grey: $color-gray-500;
+$gen-secondary-grey: $color-gray-400;
+$gen-tertiary-grey: $color-gray-200;
+$gen-quaternary-grey: $color-gray-100;
+$gen-others: $color-gray-300;
+$gen-bg1: var(--theme-bg1);
+$gen-icon: #238af9;
+
+// Legacy Blue Colors
+$gen-primary-blue: $color-blue-600;
+$gen-secondary-blue: $color-blue-500;
+$gen-tertiary-blue: $color-blue-50;
+$gen-quaternary-blue: $color-blue-100;
+$gen-blue: $color-blue-700;
+$gen-quaternary-btn: $color-gray-200;
+$gen-quaternary-btn-hover: $color-gray-300;
+$gen-primary-btn: $color-green-200;
+
+// Legacy Purple Colors
+$gen-purple: $color-blue-800;
+$gen-purple-dark: $color-blue-800;
+$gen-purple-light: $color-purple-100;
+
+// Legacy Orange Colors
+$gen-primary-orange: $color-orange-500;
+$gen-secondary-orange: $color-orange-400;
+$gen-tertiary-orange: $color-orange-300;
+$gen-orange: $color-orange-600;
+
+// Legacy Red Colors
+$gen-primary-red: $color-red-300;
+$gen-secondary-red: $color-red-200;
+$gen-tertiary-red: $color-red-100;
+
+// Legacy Green Colors
+$gen-primary-green: $color-green-200;
+$gen-secondary-green: $color-green-100;
+
+// Legacy Status Colors
+$gen-draft: $color-status-draft;
+$gen-completed: $color-status-completed;
+$gen-scheduled: $color-status-scheduled;
+$gen-inprogress: $color-status-inprogress;
+$gen-alert: $color-status-alert;
+$gen-multi-status: $color-status-multi;
+$gen-pause: $color-status-pause;
+$gen-play: $color-status-play;
+$gen-stop: $color-status-stop;
+
+// Legacy Border Colors
+$borderColor: $color-border-primary;
+$gen-border-light-gray: $color-border-secondary;
+$gen-border-light-blue: $color-border-primary;
+$gen-border-purple: $color-border-tertiary;
+$gen-border-divider: $color-border-divider;
+$gen-border-purple-light: $color-border-purple-light;
+$gen-border-blue-light: $color-border-blue-transparent;
+$gen-border-blue-lighter: $color-border-blue-transparent;
+$gen-border-divider-light: $color-border-divider-light;
+$gen-border-blue-transparent: $color-border-blue-transparent;
+$gen-border-grey: $color-border-divider;
+
+// Legacy Background Colors
+$gen-bg-hover: $color-bg-hover;
+$gen-bg-transparent: $color-bg-transparent;
+$gen-bg-light-blue: $color-bg-light-blue;
+$gen-bg-light-purple: $color-border-divider-light;
+$gen-bg-light-orange: $color-orange-600;
+$gen-bg-light-blue-transparent: $color-bg-light-blue-transparent;
+
+// Legacy Text Colors
+$gen-text-active: $color-text-active;
+$gen-text-link: $color-text-link;
+$gen-text-search: $color-text-tertiary;
+$gen-text-placeholder: $color-text-placeholder;
+$gen-link-blue: $color-blue-300;
+
+// Legacy Shadow Colors
+$genie_box_shadow: $color-shadow-box;
+$gen-shadow-black-light: $color-shadow-medium;
+$gen-shadow-black-medium: $color-shadow-strong;
+$gen-shadow-black-strong: $color-shadow-light;
+$gen-shadow-blue-light: $color-shadow-blue-light;
+$gen-shadow-blue-medium: $color-shadow-blue-medium;
+$gen-shadow-blue-strong: $color-shadow-blue-strong;
+$gen-shadow-purple: $color-shadow-purple;
+$gen-shadow-purple-hover: $color-shadow-purple-hover;
+
+// Legacy Gradient Colors
+$genie_gradient_color1: $gradient-blue-primary;
+$genie_gradient_color2: $gradient-blue-secondary;
+$genie_list_hower_gradient_color1: $gradient-purple-transparent-medium;
+$genie_list_hower_gradient_color2: $gradient-blue-transparent-medium;
+
+// Legacy Gradient Definitions
+$gen-gradient-primary: $gradient-primary;
+$gen-gradient-primary-reverse: $gradient-primary-reverse;
+$gen-gradient-hover: $gradient-hover;
+$gen-gradient-hover-strong: $gradient-hover-strong;
+$gen-gradient-hover-medium: $gradient-working;
+$gen-gradient-active: $gradient-active;
+$gen-gradient-switch: $gradient-active;
+$gen-gradient-tab: $gradient-tab;
+$gen-gradient-working: $gradient-working;
+$gen-gradient-animated: $gradient-animated;
+$gen-gradient-border-purple: linear-gradient(
+  to right,
+  $color-purple-300,
+  $color-purple-300
+);
+$gen-gradient-animated-border: $gradient-animated;
+
+// Legacy Mask Variables
+$gen-mask-content-box: linear-gradient($color-white 0 0) content-box,
+  linear-gradient($color-white 0 0);
+
+// Legacy Component Colors
+$gen-sidenav-light-gray: $component-sidenav-divider;
+$gen-sidenav-border: $component-sidenav-border;
+$gen-sidenav-hover-bg: $component-sidenav-hover;
+$gen-sidenav-active: $component-sidenav-active;
+
+$gen-search-border: $component-search-border;
+$gen-search-divider: $component-search-divider;
+
+$gen-settings-progress-orange: $component-settings-progress;
+$gen-settings-link: $component-settings-link;
+$gen-settings-divider: $component-settings-divider;
+$gen-settings-slider-bg: $component-settings-slider-bg;
+$gen-settings-slider-thumb: $component-settings-slider-thumb;
+$gen-settings-toggle-inactive: $component-settings-toggle-inactive;
+$gen-settings-toggle-active: $component-settings-toggle-active;
+
+$gen-chatbox-border: $component-chatbox-border;
+$gen-chatbox-bg: $component-chatbox-bg;
+$gen-chatbox-bubble-bg: $component-chatbox-bubble-bg;
+$gen-chatbox-divider: $component-chatbox-divider;
+$gen-chatbox-divider-light: $component-chatbox-divider-light;
+
+$gen-welcome-shadow: $component-welcome-shadow;
+
+$gen-promptbox-border: $component-promptbox-border;
+$gen-promptbox-divider: $component-promptbox-divider;
+
+$gen-workings-shadow: $component-workings-shadow;
+$gen-workings-border: $component-workings-border;
+
+$gen-help-shadow: $component-help-shadow;
+
+$gen-gallery-shadow: $component-gallery-shadow;
+
+$tooltip-bg-color: var(--theme-font2);
+$gen-error: #dc8383;
+
+/// theme color
+$gen-border: var(--theme-border1);
+$gen-card-border: var(--theme-card_border);
+
+/// exsiting theme color
+$gen-secondary-green: #99cc03;
+// Delivery type colors
+$gen-reach: #0955ff;
+$gen-engagement: #f68430;
+$gen-conversion: #92c92e;

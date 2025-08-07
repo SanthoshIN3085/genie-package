@@ -1,0 +1,90 @@
+$gen-boder: #c0cee2;
+$gen-box-shadow: rgba(0, 0, 0, 0.1);
+$font-subtitle: 13px;
+
+.settings {
+  .rs-kendo-scrollable-grid {
+    box-shadow: none;
+  }
+  &__header {
+    &__title {
+      font-size: $font-md;
+      font-family: $gen-poppins-semi-bold;
+    }
+    &__subtitle {
+      color: $gen-secondary-black;
+    }
+  }
+  &__main {
+    margin-top: 30px;
+    .gen-card-box {
+      background: $gen-white;
+      border-radius: 12px;
+      border: 1px solid $gen-boder;
+      box-shadow: 0px 0px 5px $gen-box-shadow;
+      transition: all 0.2s ease;
+      position: relative;
+      padding: 19px;
+      padding-top: 12px;
+      min-height: 354px;
+      margin: 0 0 15px;
+    }
+    &-title {
+      font-size: $font-xsm;
+      font-family: $gen-poppins-semi-bold;
+      margin-bottom: 2px;
+    }
+    &-subtitle {
+      font-size: $font-subtitle;
+      color: $gen-secondary-black;
+    }
+    &__btn {
+      padding: 10px 19px;
+      font-size: $font-subtitle;
+      background: linear-gradient(45deg, #2460f4 0%, #5a23ee 100%);
+      color: $gen-white;
+      cursor: pointer;
+      border-radius: 20px;
+      font-family: $gen-poppins-medium;
+      transition: all 0.3s ease;
+      display: block;
+      &-center {
+        position: absolute;
+        bottom: 19px;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+      }
+      &-right {
+        position: absolute;
+        right: 19px;
+        white-space: nowrap;
+      }
+    }
+    &_footer {
+      position: absolute;
+      bottom: 15px;
+      font-size: $font-xxs;
+    }
+  }
+  &__chart {
+    margin: 20px 0;
+  }
+  &__sub-section {
+    .settings {
+      &__main-title {
+        font-size: $font-xs;
+      }
+    }
+    .gen-card-box {
+      min-height: 310px;
+      box-shadow: none;
+      margin-bottom: 24px;
+    }
+  }
+}
+.alerts__content {
+  .gen-card-box {
+    min-height: 445px;
+  }
+}

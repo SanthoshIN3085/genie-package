@@ -1,0 +1,153 @@
+// Variables for reusable values
+$primary-gradient: $gen-gradient-primary;
+$shadow-color: $gen-shadow-purple;
+$transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+$default-size: 65px;
+$hover-size: 175px;
+$mobile-size: 50px;
+$mobile-hover-size: 125px;
+$gap-default: 0;
+$gap-hover: 15px;
+$gap-mobile-hover: 10px;
+
+// Block: floating-logo
+.floating-logo {
+  position: fixed;
+  right: 0;
+  bottom: 47%;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  background: $primary-gradient;
+  border: 1px solid $gen-white;
+  border-right: 0;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  box-shadow: 0 4px 24px 0 $shadow-color;
+  height: $default-size;
+  width: $default-size;
+  padding: 0 0 2px 0;
+  gap: $gap-default;
+  overflow: hidden;
+  cursor: pointer;
+  transition: width 0.5s $transition-easing, background 0.4s, gap 0.5s, padding 0.5s;
+
+  // Element: inner
+  &__inner {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  // Element: image and text
+  &__image,
+  &__text {
+    width: 100px;
+    height: $default-size;
+    object-fit: contain;
+    transition: opacity 0.5s, transform 0.5s, filter 0.4s;
+  }
+
+  // Element: text (hidden by default)
+  &__text {
+    opacity: 0;
+    transform: translateX(40px);
+    pointer-events: none;
+  }
+
+  // Modifier: hover
+  &:hover {
+    width: $hover-size;
+    gap: $gap-hover;
+    padding-right: 10px;
+
+    .floating-logo__text {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .floating-logo__image {
+      animation: floating-logo__glow 0.8s forwards;
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 1400px) {
+    height: $mobile-size;
+    width: $mobile-size;
+
+    &__inner {
+      height: $mobile-size;
+    }
+
+    &__image,
+    &__text {
+      width: 65px;
+      height: $mobile-size;
+    }
+
+    &:hover {
+      width: $mobile-hover-size;
+      gap: $gap-mobile-hover;
+      padding-right: 10px;
+    }
+  }
+}
+
+// Keyframes for glow animation
+@keyframes floating-logo__glow {
+  0% {
+    filter: drop-shadow(0 0 3px $gen-purple) drop-shadow(0 0 0px $gen-blue);
+    transform: rotate(-3deg) scale(1.01);
+  }
+  20% {
+    filter: drop-shadow(0 0 5px $gen-blue) drop-shadow(0 0 3px $gen-purple);
+    transform: rotate(3deg) scale(1.02);
+  }
+  40% {
+    filter: drop-shadow(0 0 6px $gen-blue) drop-shadow(0 0 4px $gen-purple);
+    transform: rotate(-2deg) scale(1.01);
+  }
+  60% {
+    filter: drop-shadow(0 0 5px $gen-purple) drop-shadow(0 0 6px $gen-blue);
+    transform: rotate(2deg) scale(1.015);
+  }
+  80% {
+    filter: drop-shadow(0 0 5px $gen-blue) drop-shadow(0 0 3px $gen-purple);
+    transform: rotate(-1deg) scale(1.01);
+  }
+  100% {
+    filter: drop-shadow(0 0 3px $gen-purple) drop-shadow(0 0 0px $gen-blue);
+    transform: rotate(0deg) scale(1);
+  }
+}
+.genie_wrapper {
+    .rs-overlay-modal .rs-overlay-content {
+        background: $gen-gradient-primary;
+        background-color: transparent;
+        top: 48%;
+    }
+}
+
+// Content wrapper for smooth transitions
+.content-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  
+  // Ensure content takes full space
+  > * {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// Center container for proper animation positioning
+.center-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; // Prevent content from spilling during animations
+}

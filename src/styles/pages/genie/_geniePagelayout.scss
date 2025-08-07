@@ -1,0 +1,133 @@
+.genie__page {
+  position: relative;
+  &__help {
+    margin: 0 10px;
+  }
+  &__content {
+    display: flex;
+    &-collapsed {
+      .genie__page {
+        &__sidebar {
+          width: 51px;
+          transition: width 0.3s ease-in-out;
+        }
+        &__container {
+          transition: all 0.3s ease-in-out;
+          width: calc(100% - 51px);
+        }
+      }
+    }
+  }
+
+  &__sidebar {
+    margin-right: 10px;
+    width: 210px;
+    transition: width 0.3s ease-in-out;
+    height: calc(100vh - 78px);
+  }
+
+  &__container {
+    transition: all 0.3s ease-in-out;
+    width: calc(100% - 210px);
+    padding: 0 30px;
+    background-image: url(#{$image}genie/pop-up-base.svg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 10px;
+    box-shadow: 0px 0px 5px $gen-shadow-black-strong;
+    border: 1px solid $gen-border-light-blue;
+    position: relative;
+
+    &.full-width {
+      width: 100%;
+      margin-right: 0;
+    }
+    &.home {
+      display: grid;
+      place-items: center;
+    }
+  }
+  .genie__footer {
+    text-align: center;
+    &-text {
+      font-size: $font-xxs;
+      color: $gen-others;
+    }
+    .terms-link {
+      cursor: pointer;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.genie__sidenav {
+  position: relative;
+  margin-top: 40px;
+
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__sublist {
+    list-style: none;
+    padding-left: 20px;
+    margin: 0;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+
+    .genie__sidenav__item {
+      padding: 5px 10px;
+      margin-bottom: 5px;
+      span {
+        color: $gen-primary-grey;
+        font-size: 14px;
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 9px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    &:last-child {
+      margin-bottom: 12px;
+    }
+    transition: all 0.3s ease;
+    font-family: $gen-poppins-medium;
+
+    &:hover {
+      background: $gen-gradient-hover;
+    }
+
+    span {
+      font-size: $font-xs;
+      color: $gen-primary-black;
+    }
+
+    i {
+      color: $gen-primary-black;
+      transition: transform 0.3s ease;
+    }
+
+    &-btn--active {
+      background: $gen-gradient-hover;
+      span {
+        color: $gen-link-blue;
+      }
+      i {
+        color: $gen-link-blue;
+      }
+    }
+  }
+}

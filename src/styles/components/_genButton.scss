@@ -1,0 +1,166 @@
+//RSButton
+.gen-button {
+  @include sizing($lh: 24px, $fs: $font-xs);
+  @include br($radius: 20px);
+  @include textalign($ta: center);
+  @include space($padding: 8px 20px);
+  border: 0;
+  outline: 0;
+  margin: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+  // @extend %animate;
+  &.rbccti-sl-1 {
+    display: inline-block;
+    background-color: $gen-primary-orange;
+    border: 1px solid $gen-primary-orange;
+    color: $gen-white;
+    text-decoration: none !important;
+    &:hover,
+    &:focus,
+    &:target {
+      outline: 1px dashed $gen-white;
+    }
+  }
+  &.rbccti-sl-2 {
+    display: inline-block;
+    background-color: transparent;
+    border: 1px solid transparent;
+    color: $gen-white;
+    text-decoration: underline;
+    border-radius: 0;
+    @include space($padding: 8px 10px);
+    &:hover,
+    &:focus,
+    &:target {
+      outline: 1px dashed $gen-white;
+    }
+  }
+}
+
+//RSButtonPrimary
+.gen-button-primary {
+  @include colorwithgradiant($color: $gen-white, $bg: $gradient-primary-btn);
+  transition: all 0.3s ease;
+
+  &:hover,
+  &:focus,
+  &:target {
+    @include color($bg: $genie_gradient_color1);
+    box-shadow: 0 0px 15px $genie_gradient_color1;
+  }
+}
+
+//RSButtonSecondary
+.gen-button-secondary {
+  @include color($color: $gen-secondary-orange, $bg: transparent);
+  @include space($padding: 6px 8px);
+  @include sizing($fs: 18px);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  &:hover,
+  &:focus,
+  &:target {
+    text-decoration: underline;
+  }
+}
+
+//RSTertiaryButton
+.gen-button-tertiary {
+  @include color($color: $gen-white, $bg: $gen-secondary-blue);
+  transition: all 0.3s ease;
+  font-size: 13px;
+  @include space($padding: 3px 8px);
+
+  &:hover,
+  &:focus,
+  &:target {
+    @include color($bg: $gen-secondary-blue);
+    box-shadow: 0 0px 15px $gen-primary-blue;
+  }
+}
+
+//RSQuaternaryButton
+.gen-button-quaternary {
+  @include color($color: $gen-primary-black, $bg: $gen-quaternary-btn);
+  transition: all 0.3s ease;
+  font-size: 13px;
+  @include space($padding: 3px 8px);
+
+  &:hover,
+  &:focus,
+  &:target {
+    @include color($bg: $gen-quaternary-btn-hover);
+    box-shadow: 0 0px 15px $gen-quaternary-btn-hover;
+  }
+}
+//RSbgsecondaryblue
+.gen-bg-secondary-blue {
+  &:hover {
+    background-color: $gen-secondary-blue !important;
+    box-shadow: 0 0px 15px $gen-secondary-blue !important;
+  }
+}
+
+.button-link,
+.gen-button-link-small,
+.gen-button-link,
+.gen-button-green {
+  @include color($color: $gen-primary-orange, $bg: transparent);
+  @include space($padding: 6px 8px);
+  @include sizing($fs: 18px);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  &:hover,
+  &:focus,
+  &:target {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+.gen-button-green {
+  color: $gen-primary-btn !important;
+}
+
+.gen-button-link-small {
+  font-size: $font-xxs;
+  padding: 0;
+}
+
+.buttons-holder,
+.modal-footer {
+  @include textalign($ta: right);
+  @include space($mt: var(--pageButtonTopSpace), $mb: 0);
+  // @extend .clearfix;
+  .gen-button {
+    @include space($ml: 1rem);
+    &:first-child {
+      @include space($margin: 0);
+    }
+  }
+}
+.modal-footer {
+  @include space($mt: var(--formGroupBottomSpace), $mb: 0);
+}
+
+.gen-button-upload {
+  border: 1px dashed $gen-secondary-blue;
+  color: $gen-secondary-black;
+  background-color: $gen-white;
+  padding: 12px 30px;
+  border-radius: 3px;
+  font-size: 16px;
+  line-height: 20px;
+  margin: auto;
+  display: block;
+  width: 100%;
+  span {
+    display: block;
+    padding: 0;
+    font-size: 14px;
+    line-height: 20px;
+    opacity: 0.9;
+  }
+}

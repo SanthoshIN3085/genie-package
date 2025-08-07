@@ -1,0 +1,26 @@
+@media (min-width: 1800px) {
+  .genie {
+    .gallery-center,
+    .welcome {
+      max-width: 1110px;
+    }
+    .prompt__gallery {
+      h4 {
+        font-size: $font-xl;
+      }
+    }
+    .welcome {
+      &__header {
+        margin-bottom: 90px;
+        margin-top: 40px;
+        &__title {
+          font-size: 60px;
+        }
+      }
+      &__action-card {
+        width: 240px;
+        height: 145px;
+      }
+    }
+  }
+}

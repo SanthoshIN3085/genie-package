@@ -1,0 +1,245 @@
+// using
+@mixin sizing(
+  $ff: false,
+  $fs: false,
+  $w: false,
+  $h: false,
+  $lh: false,
+  $wh: false,
+  $mh: false,
+  $fw: false,
+  $mw: false,
+  $maxw: false,
+  $maxh: false
+) {
+  @if $ff {
+    font-family: $ff;
+  }
+  @if $fs {
+    font-size: $fs;
+  }
+  @if $w {
+    width: $w;
+  }
+  @if $h {
+    height: $h;
+  }
+  @if $lh {
+    line-height: $lh;
+  }
+  @if $wh {
+    width: $wh;
+    height: $wh;
+  }
+  @if $mh {
+    min-height: $mh;
+  }
+  @if $fw {
+    font-weight: $fw;
+  }
+  @if $mw {
+    min-width: $mw;
+  }
+  @if $maxw {
+    max-width: $maxw;
+  }
+  @if $maxh {
+    max-height: $maxh;
+  }
+}
+
+// Font Face
+// =============================================================================
+
+@mixin font-face(
+  $name,
+  $path,
+  $weight: null,
+  $style: null,
+  $exts: eot woff ttf
+) {
+  // @mixin font-face($name, $path, $weight: null, $style: null, $exts: eot woff2 woff ttf svg) {
+  $src: null;
+
+  $extmods: (
+    eot: "?",
+    // svg: '#' + str-replace($name, ' ', '_'),
+  );
+
+  $formats: (
+    otf: "opentype",
+    ttf: "truetype",
+  );
+
+  @each $ext in $exts {
+    $extmod: if(
+      map-has-key($extmods, $ext),
+      $ext + map-get($extmods, $ext),
+      $ext
+    );
+    $format: if(map-has-key($formats, $ext), map-get($formats, $ext), $ext);
+    $src: append(
+      $src,
+      url(quote($path + "." + $extmod)) format(quote($format)),
+      comma
+    );
+  }
+
+  @font-face {
+    font-family: quote($name);
+    font-style: $style;
+    font-weight: $weight;
+    src: $src;
+  }
+}
+
+// margin padding letter-spacing list-style
+@mixin space(
+  $margin: false,
+  $padding: false,
+  $mt: false,
+  $ml: false,
+  $mr: false,
+  $mb: false,
+  $pt: false,
+  $pl: false,
+  $pr: false,
+  $pb: false,
+  $letterspace: false,
+  $liststyle: false
+) {
+  @if ($margin) {
+    margin: $margin;
+  }
+  @if ($padding) {
+    padding: $padding;
+  }
+  @if ($mt) {
+    margin-top: $mt;
+  }
+  @if ($ml) {
+    margin-left: $ml;
+  }
+  @if ($mr) {
+    margin-right: $mr;
+  }
+  @if ($mb) {
+    margin-bottom: $mb;
+  }
+  @if ($pt) {
+    padding-top: $pt;
+  }
+  @if ($pl) {
+    padding-left: $pl;
+  }
+  @if ($pr) {
+    padding-right: $pr;
+  }
+  @if ($pb) {
+    padding-bottom: $pb;
+  }
+  @if ($letterspace) {
+    letter-spacing: $letterspace;
+  }
+  @if ($liststyle) {
+    list-style: $liststyle;
+  }
+}
+
+@mixin color($color: false, $bg: false) {
+  @if $color {
+    color: $color;
+  }
+  @if $bg {
+    background-color: $bg;
+  }
+}
+@mixin colorwithgradiant($color: false, $bg: false) {
+  @if $color {
+    color: $color;
+  }
+  @if $bg {
+    background: $bg;
+  }
+}
+
+@mixin br($radius) {
+  -webkit-border-radius: $radius;
+  -ms-border-radius: $radius;
+  border-radius: $radius;
+}
+// text-align & text-decoration common use
+@mixin textalign($ta: false) {
+  @if ($ta) {
+    text-align: $ta;
+  }
+}
+@mixin bor($width: 1px, $borderStyle: solid, $color: $dropdown-border) {
+  border: $width $borderStyle $color;
+}
+
+@mixin border-radius-all(
+  $brtl: false,
+  $brtr: false,
+  $brbl: false,
+  $brbr: false,
+  $borderStyle: false
+) {
+  @if $borderStyle {
+    border-style: $borderStyle;
+  }
+  @if $brtl {
+    border-top-left-radius: $brtl;
+  }
+  @if $brtr {
+    border-top-right-radius: $brtr;
+  }
+  @if $brbr {
+    border-bottom-right-radius: $brbr;
+  }
+  @if $brbl {
+    border-bottom-right-radius: $brbl;
+  }
+}
+
+@mixin css3-prefix($props, $value) {
+  -webkit-#{$props}: #{$value};
+  -moz-#{$props}: #{$value};
+  -ms-#{$props}: #{$value};
+  -o-#{$props}: #{$value};
+  #{$props}: #{$value};
+}
+// ABSOLUTE POSITIONING
+@mixin abs-position(
+  $position: null,
+  $top: null,
+  $right: null,
+  $bottom: null,
+  $left: null,
+  $zindex: null,
+  $contentcommon: null,
+  $dc: null
+) {
+  // position: absolute;
+  position: $position;
+  top: $top;
+  right: $right;
+  bottom: $bottom;
+  left: $left;
+  z-index: $zindex;
+  content: $contentcommon;
+  display: $dc;
+}
+
+// Dropdown tip up arrow start
+@mixin Dropdownuparrow() {
+  @include abs-position($position: absolute, $contentcommon: "");
+  @include sizing($wh: 8px);
+  background-color: $gen-white;
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
+  @include bor($color: $gen-quaternary-blue);
+  border-right: none;
+  border-bottom: none;
+}
+// Dropdown tip up arrow end

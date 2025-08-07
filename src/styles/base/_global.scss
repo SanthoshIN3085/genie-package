@@ -1,0 +1,157 @@
+.click-off {
+  cursor: default !important;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+%css-scrollbar,
+%css-scrollbar-y {
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  @-moz-document url-prefix() {
+    scrollbar-color: $gen-secondary-grey $gen-tertiary-grey;
+  }
+  @-moz-document url-prefix() {
+    scrollbar-width: thin;
+  }
+  &::-webkit-scrollbar-track {
+    display: none;
+    background: transparent;
+  }
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    background-color: transparent;
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 100px;
+    -webkit-border-radius: 100px;
+    -moz-border-radius: 100px;
+    cursor: pointer;
+  }
+  &:hover {
+    &::-webkit-scrollbar-thumb {
+      background-color: $gen-secondary-grey;
+      border-radius: 3px;
+    }
+  }
+}
+
+.css-scrollbar {
+  @extend %css-scrollbar;
+}
+
+.css-scrollbar-x {
+  @extend %css-scrollbar;
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+.box-design {
+  @extend .primary-box-shadow;
+  @include bor($width: 1px, $color: $gen-quaternary-blue);
+  @include br($radius: var(--globalBorderRadius));
+  @include color($bg: $gen-white);
+  // @include space($padding: 30px);
+  @include space($padding: 19px);
+  &.bd-top-border {
+    @include border-radius-all($brtl: 0, $brtr: 0);
+    border-top: 2px solid $gen-secondary-blue;
+  }
+  .row {
+    //--bs-gutter-y: 1.9rem;
+    --bs-gutter-x: 1.9rem;
+    &.gx-5 {
+      --bs-gutter-x: 3rem;
+    }
+    &.g-5 {
+      --bs-gutter-x: 3rem;
+    }
+  }
+  &.no-box-shadow {
+    box-shadow: none !important;
+  }
+  &.no-padding {
+    padding: 0 !important;
+  }
+}
+
+// Form fields required Class - end css
+.rs-input-wrapper {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  .border-bottom-required {
+    position: absolute;
+  }
+  //&.rs-input-wrapper-required {
+  input,
+  input[disabled],
+  input[readonly],
+  input[required] {
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    outline: none !important;
+    box-shadow: none !important;
+    padding-left: 0;
+    padding-right: 20px;
+    border-bottom: 1px solid $gen-secondary-grey;
+    width: 100%;
+    &:placeholder-shown {
+      & + label {
+        top: 1px; // -1px;
+        font-size: $font-xsm;
+      }
+    }
+    & + label {
+      position: absolute;
+      left: 0;
+      top: -16px;
+      color: $gen-secondary-grey;
+      font-size: $font-xxs;
+      transition: all 0.4s ease;
+      z-index: 1;
+    }
+    &:focus {
+      border-color: $gen-secondary-blue;
+      & + label {
+        top: -16px;
+        font-size: $font-xxs;
+        color: $gen-primary-grey;
+      }
+      & + label + .border-bottom-required {
+        //display: none;
+      }
+    }
+    & + label + .border-bottom-required {
+      &::before {
+        content: "";
+        width: 15px;
+        height: 1px;
+        border-bottom: 3px solid #ff3939;
+        position: absolute;
+        bottom: -2px;
+        z-index: 4;
+      }
+    }
+    // }
+  }
+  &.input-custom-icon {
+    input,
+    input[disabled],
+    input[readonly],
+    input[required] {
+      padding-right: 24px;
+    }
+  }
+  &.input-custom-double-icon {
+    input,
+    input[disabled],
+    input[readonly],
+    input[required] {
+      padding-right: 50px;
+    }
+  }
+}

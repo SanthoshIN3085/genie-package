@@ -1,0 +1,108 @@
+.font-poppins-regular {
+  #{$ff}: $gen-poppins-regular;
+}
+.font-poppins-medium {
+  #{$ff}: $gen-poppins-medium;
+}
+.font-poppins-bold {
+  #{$ff}: $gen-poppins-bold;
+}
+.font-poppins-semi-bold {
+  #{$ff}: $gen-poppins-semi-bold;
+}
+.font-poppins-light {
+  #{$ff}: $gen-poppins-light;
+}
+
+// Font Face Declarations for Poppins fonts using assets/fonts directory
+@font-face {
+  font-family: 'PoppinsLight';
+  src: url('../assets/fonts/Poppinslight.woff') format('woff'),
+       url('../assets/fonts/Poppinslight.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PoppinsRegular';
+  src: url('../assets/fonts/Poppinsregular.woff') format('woff'),
+       url('../assets/fonts/Poppinsregular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PoppinsMedium';
+  src: url('../assets/fonts/Poppinsmedium.woff') format('woff'),
+       url('../assets/fonts/Poppinsmedium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PoppinsSemiBold';
+  src: url('../assets/fonts/Poppinssemibold.woff') format('woff'),
+       url('../assets/fonts/Poppinssemibold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PoppinsBold';
+  src: url('../assets/fonts/Poppinsbold.woff') format('woff'),
+       url('../assets/fonts/Poppinsbold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+// Icon sizes
+.icon-xs,
+.icon-mini {
+  font-size: $icon-xs !important;
+} // 15px
+.icon-md {
+  font-size: $icon-md !important;
+} // 24px
+.icon-lg {
+  font-size: $icon-lg !important;
+} // 32px
+.icon-xl {
+  font-size: $icon-xl !important;
+} // 45px
+.icon-xxl {
+  font-size: $icon-xxl !important;
+} // 50px
+
+// Fonts sizes
+.font-xxs {
+  font-size: $font-xxs !important;
+} // 12px
+.font-xs {
+  font-size: $font-xs !important;
+} // 15px
+.font-xsm {
+  font-size: $font-xsm !important;
+} // 17px
+.font-sm {
+  font-size: $font-sm !important;
+} // 19px
+.font-smd {
+  font-size: $font-smd !important;
+} // 21px
+.font-md {
+  font-size: $font-md !important;
+} // 24px
+.font-lg {
+  font-size: $font-lg !important;
+} // 32px
+.font-xl {
+  font-size: $font-xl !important;
+} // 45px
+.font-xxl {
+  font-size: $font-xxl !important;
+} // 50px

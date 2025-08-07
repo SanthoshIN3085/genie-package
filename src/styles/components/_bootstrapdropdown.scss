@@ -1,0 +1,93 @@
+.dropdown-toggle.btn.btn-primary {
+  font-family: $gen-poppins-medium;
+  font-size: $font-xs;
+  color: $gen-secondary-black;
+  &:hover {
+    color: #4464ed;
+  }
+  &::after {
+    position: relative;
+    top: 4px;
+    margin-left: 10px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 7px solid $gen-secondary-grey;
+  }
+}
+
+.rs-bootstrap-dropdown .rs-dropdown .dropdown-menu {
+  box-shadow: 0px 0px 5px $genie_box_shadow;
+  border: 1px solid $gen-border;
+  border-radius: 10px;
+  padding: 5px;
+  background-color: $gen-bg1;
+  .css-scrollbar {
+    div {
+      margin-bottom: 5px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+  &::before {
+    position: absolute;
+    content: "";
+    width: 8px;
+    height: 8px;
+    background-color: $gen-white;
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+    border: 1px solid $gen-border;
+    border-right: none;
+    border-bottom: none;
+    right: var(--arrow-right, 13px);
+    left: var(--arrow-left, auto);
+    top: -5px;
+  }
+
+  // Handle top placement - arrow should point down
+  &[x-placement="top-start"],
+  &[x-placement="top-end"],
+  &[x-placement="top"] {
+    &::before {
+      top: auto;
+      bottom: -5px;
+      border-right: 1px solid $gen-border;
+      border-bottom: 1px solid $gen-border;
+      border-left: none;
+      border-top: none;
+    }
+  }
+
+  .dropdown-item {
+    font-size: 14px;
+    padding: 8px 5px;
+    color: $gen-secondary-black;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+    font-family: $gen-poppins-light;
+    border-radius: 10px;
+
+    &:active,
+    &:focus,
+    &:hover {
+      background: linear-gradient(
+        45deg,
+        rgba(35, 156, 248, 0.2) 0%,
+        rgba(90, 24, 243, 0.2) 100%
+      );
+    }
+  }
+}
+.rs-bootstrap-dropdown .rs-dropdown .dropdown-menu {
+  margin: 0 -10px 0 0;
+}
+
+.no_caret {
+  .dropdown-toggle.btn.btn-primary::after {
+    display: none;
+  }
+}

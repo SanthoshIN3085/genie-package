@@ -1,0 +1,50 @@
+.theme-dark {
+  .genie {
+    .genie__page {
+      &__container {
+        background: var(--theme-inner);
+        border: 0;
+      }
+    }
+    //welcome
+    .welcome {
+      &__action-card,
+      &__recommended-prompt {
+        border: 0;
+      }
+      &__recommended--search-mode::before {
+        border-color: var(--theme-placeholder);
+      }
+    }
+    .input-prompt-block::before {
+      background: var(--theme-placeholder);
+    }
+    // sidenav
+    .genie__sidenav {
+      &__toggle-icon {
+        border: 0;
+      }
+    }
+    .prompt__gallery {
+      &__tabber .tabDefault {
+        border: 0;
+        background: var(--theme-bg);
+        opacity: 0.4;
+        &.active {
+          opacity: 1;
+        }
+      }
+      &__card__content-item {
+        border: 0;
+      }
+    }
+    .chatbox {
+      &__data-item {
+        border: 0;
+      }
+      &__data-footer {
+        border-color: #2f3554;
+      }
+    }
+  }
+}

@@ -1,0 +1,109 @@
+.genie-header {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  padding-bottom: 15px;
+  padding-top: 10px;
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    left: 0;
+    top: 10px;
+    &-wrapper {
+      position: relative;
+    }
+
+    &-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      &.collapsed {
+        .genie-header__text-logo {
+          display: none;
+        }
+      }
+    }
+  }
+
+  &__text-logo {
+    height: 55px;
+    width: 110px;
+
+    &.hidden {
+      opacity: 0;
+      display: none;
+    }
+
+    &.visible {
+      opacity: 1;
+    }
+  }
+
+  &__ai-logo {
+    height: 55px;
+    transition: opacity 0.3s ease;
+
+    &.hidden {
+      opacity: 0;
+      display: none;
+    }
+
+    &.visible {
+      opacity: 1;
+    }
+  }
+
+  &__beta {
+    position: absolute;
+    top: 8px;
+    right: -45px;
+    img {
+      height: 13px;
+    }
+    &.small {
+      img {
+        height: 18px;
+      }
+      right: -5px;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    // i {
+    //     padding: 5px;
+    //     border-radius: 5px;
+    // }
+    .active {
+      background: $gen-gradient-hover;
+    }
+    &__search {
+      .searchBar {
+        position: absolute;
+        right: 144px;
+        top: 1px;
+        z-index: 99999;
+      }
+    }
+  }
+
+  &__icon {
+    @include sizing($wh: 23px);
+    cursor: pointer;
+  }
+}
+
+.Genie-video.modal {
+  .modal-dialog .modal-content .modal-body {
+    padding-top: 19px;
+  }
+  .modal-content.rsmd-content {
+    margin: 0;
+    padding-bottom: 10px;
+  }
+}

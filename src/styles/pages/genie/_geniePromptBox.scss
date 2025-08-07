@@ -1,0 +1,97 @@
+.input-prompt-block {
+  border-radius: 10px;
+  background: $gen-black;
+  color: $gen-secondary-black;
+  font-size: $font-xs;
+  min-height: 45px;
+  padding: 8px 10px 10px;
+  &.searchBox {
+    border: 1px solid $gen-tertiary-grey;
+    &::before {
+      display: none;
+    }
+  }
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    padding: 1px;
+    background: $gen-gradient-border-purple;
+    -webkit-mask: $gen-mask-content-box;
+    mask: $gen-mask-content-box;
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  &.no-border-bottom {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    &::before {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+  &.active::before {
+    background: $gen-gradient-animated-border;
+    background-size: 200% 100%;
+    animation: moveGradient 3s linear infinite;
+  }
+  @keyframes moveGradient {
+    0% {
+      background-position: 100% 0;
+    }
+    100% {
+      background-position: -100% 0;
+    }
+  }
+  .rs-textarea-wrapper {
+    &::before {
+      content: "";
+      border-right: 1px solid $gen-border-blue-transparent;
+      height: 100%;
+      position: absolute;
+      right: 0;
+      pointer-events: none;
+    }
+    &.no-before {
+      &::before {
+        display: none;
+      }
+    }
+    textarea {
+      border: none;
+      background: $gen-black;
+      max-height: 100px;
+      line-height: 25px;
+      padding: 0;
+      resize: none;
+      width: 100%;
+      outline: 0;
+      color: $color-text-secondary;
+      &::placeholder {
+        color: $gen-others;
+      }
+    }
+    .extractedTag {
+      padding-left: 98px;
+    }
+    label {
+      opacity: 0.5;
+      font-size: $font-xs;
+    }
+    .form-control:not(:placeholder-shown),
+    .form-control:focus {
+      ~ label {
+        display: none;
+      }
+    }
+    &.form-floating textarea.form-control:focus:focus {
+      border-color: $gen-border-purple;
+    }
+  }
+  .send,
+  .audio-listening {
+    width: 28px;
+  }
+}

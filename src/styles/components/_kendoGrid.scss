@@ -1,0 +1,50 @@
+.gen-kendo-grid-table {
+  .k-grid {
+    border-radius: 10px;
+    box-shadow: 0px 0px 5px $genie_box_shadow;
+    border: 1px solid $borderColor;
+    padding: 5px;
+    background-color: $gen-white;
+    width: 100% !important;
+    .k-grid-header {
+      padding: 0;
+    }
+
+    .k-table-row.k-table-alt-row {
+      background-color: $gen-tertiary-blue;
+    }
+    .k-table-th,
+    .k-grid .k-table-td {
+      border-color: $gen-quaternary-grey;
+    }
+    .k-table-row:hover {
+      background-color: inherit !important;
+      background-image: none !important;
+      box-shadow: none !important;
+    }
+    .k-table-row.k-table-alt-row:hover {
+      background-color: $gen-tertiary-blue !important;
+    }
+  }
+  .k-grid-content {
+    overflow: hidden;
+  }
+  .k-grid table {
+    width: 100% !important;
+  }
+  .k-table-thead {
+    background: $gradient-primary-btn;
+  }
+  .k-grid-header-wrap {
+    padding: 0;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  .k-column-title {
+    color: $gen-white;
+  }
+  .k-grid-md td,
+  .k-grid-md .k-table-td {
+    white-space: nowrap;
+  }
+}

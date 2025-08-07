@@ -1,0 +1,52 @@
+$image: "../assets/images/";
+$fontFolder: "../styles/fonts/";
+$fontName: "Poppins";
+$poppins: "Poppins";
+
+$gen-poppins-regular: "PoppinsRegular", sans-serif;
+$gen-poppins-medium: "PoppinsMedium", sans-serif;
+$gen-poppins-bold: "PoppinsBold", sans-serif;
+$gen-poppins-semi-bold: "PoppinsSemiBold", sans-serif;
+$gen-poppins-light: "PoppinsLight", sans-serif;
+$emoji-font: EmojiMart, "Segoe UI Emoji", "Segoe UI Symbol", "Segoe UI",
+  "Apple Color Emoji", "Twemoji Mozilla", "Noto Color Emoji", "Android Emoji";
+
+$ff: font-family;
+
+// ::Font size::
+$font-xxs: 11px;
+$font-xs: 15px;
+$font-xsm: 17px;
+$font-sm: 19px;
+$font-smd: 21px;
+$font-md: 23px;
+$font-lg: 32px;
+$font-xl: 45px;
+$font-xxl: 50px;
+
+// ::Icon size::
+$icon-xs: 15px;
+$icon-smd: 21px;
+$icon-md: 24px;
+$icon-lg: 32px;
+$icon-xl: 45px;
+$icon-xxl: 50px;
+
+// ::Font size::
+$letterSpacing: 0.5px;
+
+:root {
+  --globalSpace: 24px;
+  --formGroupBottomSpace: 41px;
+  --pageButtonTopSpace: 21px;
+  --gridbottomSpace: 25px;
+  --sliderthumbColor: #3bbf10;
+  --sentimentColor: #5ba529;
+  // --editorbgcolor: #000;
+  --globalBorderRadius: 10px;
+  --borderRadiusTabDropMenu: 7px;
+  --preferencesPrefCardSpace: 21px;
+}
+
+//genie
+$genie_line_height: 21px;
