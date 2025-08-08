@@ -115,7 +115,24 @@ function Genie() {
 
   const handleSideNavClick = (activePage) => {
     const handler = navigationHandlers[activePage];
-    handler();
+    if (typeof handler === "function") {
+      handler();
+      return;
+    }
+    // Gracefully handle unknown nav ids (e.g., 'token-usage')
+    if (activePage === "token-usage") {
+      // Route to settings dashboard as a sensible default action
+      dispatch(
+        updateSettings({
+          settingsTab: true,
+          activeSectionSettings: "dashboard",
+        })
+      );
+      return;
+    }
+    // Fallback to New Prompt
+    const fallback = navigationHandlers[NAV_ITEMS.NEW_PROMPT];
+    if (typeof fallback === "function") fallback();
   };
 
   const handleNewChat = () => {
