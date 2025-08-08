@@ -27,6 +27,8 @@ const VoiceRecognition = ({ onFormSubmit = () => {} }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [hasStartedSpeaking, setHasStartedSpeaking] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
+    const SILENCE_LIMIT_MS = 5000; // Stop listening after 5s of silence
+    const silenceTimerRef = useRef(null);
     const debounceDelay = 2000; // 2 seconds to wait after last speech before auto-submit
     const continuousListeningOptions = useMemo(
         () => ({
@@ -41,6 +43,23 @@ const VoiceRecognition = ({ onFormSubmit = () => {} }) => {
 
     const updateSpeechState = useCallback((data) => dispatch(updateSpeech(data)), [dispatch]);
     const updateChatState = useCallback((data) => dispatch(updateChat(data)), [dispatch]);
+
+    const clearSilenceTimer = () => {
+        if (silenceTimerRef.current) {
+            clearTimeout(silenceTimerRef.current);
+            silenceTimerRef.current = null;
+        }
+    };
+
+    const resetSilenceTimer = () => {
+        clearSilenceTimer();
+        silenceTimerRef.current = setTimeout(() => {
+            // After 5 seconds of no transcript change, stop listening
+            if (listening) {
+                stopListening();
+            }
+        }, SILENCE_LIMIT_MS);
+    };
 
     const startListening = () => {
         resetTranscript();
@@ -72,6 +91,9 @@ const VoiceRecognition = ({ onFormSubmit = () => {} }) => {
         setTimeout(() => {
             setIsInitialized(true);
         }, 1000);
+
+        // Start silence timer even if the user hasn't spoken yet
+        resetSilenceTimer();
     };
 
     const stopListening = () => {
@@ -83,6 +105,7 @@ const VoiceRecognition = ({ onFormSubmit = () => {} }) => {
             inputVoiceSearch: false,
         });
         clearTimeout(debounceTimeout);
+        clearSilenceTimer();
         
         // Manual submission if user stops listening and there's a transcript
         if (transcript && transcript.trim() && !isSubmitting) {
@@ -205,32 +228,16 @@ const VoiceRecognition = ({ onFormSubmit = () => {} }) => {
             }
         }
 
-        // Auto-submit: submit after user stops speaking for debounceDelay (2 seconds)
-        if (listening && transcript && !isSubmitting && isInitialized) {
-            clearTimeout(debounceTimeout);
-            const id = setTimeout(() => {
-                // Only submit if still not speaking after debounceDelay and not already submitting
-                if (transcript && transcript.trim() && !isSubmitting) {
-                    setIsSubmitting(true);
-                    const correctedTranscript = transformGenieWords(transcript);
-                    
-                    onFormSubmit(correctedTranscript);
-                    resetTranscript();
-                    // Clear the input field after submission
-                    setValue('searchInput', '');
-                    // Reset the submitting flag after a short delay
-                    setTimeout(() => {
-                        setIsSubmitting(false);
-                    }, 1000);
-                }
-            }, debounceDelay);
-            setDebounceTimeout(id);
+        // Reset 5s silence timer on any transcript change while listening
+        if (listening) {
+            resetSilenceTimer();
+        } else {
+            clearSilenceTimer();
         }
-        // If listening but transcript is empty, clear any pending submit
-        if (listening && !transcript) {
-            clearTimeout(debounceTimeout);
-        }
-    }, [isListening, listening, transcript, debounceDelay, isSubmitting]);
+
+        // Disable 2s auto-submit while listening to allow mid-sentence pauses (3–4s) without submission.
+        // Submission now happens only when the 5s silence timer triggers stopListening().
+    }, [isListening, listening, transcript, debounceDelay, isSubmitting, isInitialized]);
 
     //componentWillUnmount Phase
     useEffect(() => {
@@ -240,6 +247,7 @@ const VoiceRecognition = ({ onFormSubmit = () => {} }) => {
             }
             clearTimeout(debounceTimeout);
             resetTranscript();
+            clearSilenceTimer();
         };
     }, []);
 
