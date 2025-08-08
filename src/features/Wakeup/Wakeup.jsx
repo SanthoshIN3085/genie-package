@@ -4,7 +4,7 @@ import SpeechRecognition, {
 } from "react-speech-recognition";
 import * as genieIcons from "../../assets/genieIcons";
 import { useDispatch, useSelector } from "react-redux";
-import { updateChat, updateSpeech, updateSearch } from "Reducers/genie/reducer";
+import { updateChat, updateSpeech, updateSearch, updateUI } from "Reducers/genie/reducer";
 import {
   systemPhrases,
   analysisKeywords,
@@ -264,6 +264,11 @@ function WakeupComponent({
         })
       );
       dispatch(
+        updateUI({
+          showAlert: false,
+        })
+      );
+      dispatch(
         updateChat({
           userCommand: "",
         })
@@ -290,6 +295,11 @@ function WakeupComponent({
           dispatch(
             updateSpeech({
               wakeup: false,
+            })
+          );
+          dispatch(
+            updateUI({
+              showAlert: false,
             })
           );
           setShowHome(true);
@@ -319,6 +329,11 @@ function WakeupComponent({
           dispatch(
             updateSpeech({
               wakeup: false,
+            })
+          );
+          dispatch(
+            updateUI({
+              showAlert: false,
             })
           );
           setShowHome(true);
@@ -363,6 +378,11 @@ function WakeupComponent({
               wakeup: false,
             })
           );
+          dispatch(
+            updateUI({
+              showAlert: false,
+            })
+          );
           setShowHome(true);
           handleNewChat();
           setHasBeenWoken(false);
@@ -385,6 +405,11 @@ function WakeupComponent({
         dispatch(
           updateSpeech({
             wakeup: false,
+          })
+        );
+        dispatch(
+          updateUI({
+            showAlert: false,
           })
         );
         audioToPlay(genieIcons?.Closingnow);
