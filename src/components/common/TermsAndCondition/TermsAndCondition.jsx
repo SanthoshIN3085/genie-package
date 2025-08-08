@@ -51,9 +51,9 @@ function TermsAndCondition() {
                 {!isTermsAndConditions && (
                   <GenSecondaryButton
                     onClick={() => {
-                      setShowModal(false);
                       dispatch(
                         updateUI({
+                          showAlert: false,
                           howerStarIcon: false,
                         })
                       );
