@@ -1,190 +1,118 @@
 import { replace, lowerCase } from "lodash";
-export const systemPhrases = [
-  "what can i do for you today",
-  "would you like to proceed",
-  "sure",
-  "ok",
-  "proceeding with your request",
-  "i could not assist with you here, please check with genie dashboard",
-  "okay, please check with the genie dashboard for assistance",
-];
+import constants from "./constants.json";
 
-export const openKeywords = new Set(
-  [
-    "hey jini",
-    "hi jini",
-    "hey genie",
-    "hi genie",
-    "hey jenny",
-    "hi jenny",
-    "hey jeeni",
-    "hi jeeni",
-    "hey jeani",
-    "hi jeani",
-    "hi gini",
-    "hey gini", 
-    "hi ginny",
-    "hey ginny",
-    "hi jeanie",
-    "hey jeanie",
-    "hi jeannie",
-    "hey jeannie",
-    "hi jinni",
-    "hey jinni",
-    "hi djinni",
-    "hey djinni",
-    "hi chini",
-    "hey chini",
-    "hello chini",
-    "hello chinni",
-    "hey chinni",
-    "hi chinni",
-    "hygienic",
-    "open jini",
-    "wake up jini",
-    "start jini",
-    "ghajini",
-    "rajini",
-    "hello genie",
-    "hello jenny",
-    "hey ji",
-    "hi ji",
-    "hello ji",
-    "hello gi",
-    "hi gi",
-    "hygien",
-    "hello gen", 
-    "hello jen",
-  ]);
+// Import constants from JSON
+export const systemPhrases = constants.systemPhrases;
+export const openKeywords = constants.openKeywords;
+export const closeKeywords = constants.closeKeywords;
+export const analysisKeywords = constants.analysisKeywords;
+export const proceedingText = constants.proceedingText;
+export const chatSkipPhrases = constants.chatSkipPhrases;
+export const darkModeOnPhrases = constants.darkModeOnPhrases;
+export const lightModeOnPhrases = constants.lightModeOnPhrases;
+export const darkModeOffPhrases = constants.darkModeOffPhrases;
+export const lightModeOffPhrases = constants.lightModeOffPhrases;
 
-export const closeKeywords = new Set(
-  [
-    "goodbye jini",
-    "goodbye genie",
-    "by jini",
-    "close jini",
-    "exit jini",
-    "go to sleep jini",
-    "stop jini",
-    "bye jini",
-    "close genie",
-    "exit genie",
-    "bye genie",
-    "close recent",
-    "bye recent",
-    "by genie",
-    "by jini",
-    "close jenny",
-    "close genie",
-  ]);
+// Profanity filter - Common profanity words to filter out
+export const profanityWords = constants.profanityWords;
 
-export const analysisKeywords = new Set(
-  ["create", "communication", "segment", "analytics", "campaign"].map(
-    (keyword) => lowerCase(keyword)
-  )
+// Create RegExp patterns for better performance
+export const openKeywordsRegex = new RegExp(
+  constants.openKeywords
+    .map((keyword) => `\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`)
+    .join("|"),
+  "i"
 );
-export const proceedingText = [
-  "yes",
-  "proceed",
-  "ok",
-  "okay",
-  "sure",
-  "absolutely",
-  "of course",
-  "yeah",
-  "yep",
-  "yup",
-  "please",
-  "go ahead",
-  "affirmative",
-  "do it",
-  "move on",
-  "continue",
-  "confirm",
-  "i agree",
-  "ready",
-  "start",
-  "next",
-  "alright",
-  "fine",
-  "sounds good",
-  "good to go",
-  "yessir",
-  "yea",
-  "roger",
-  "correct",
-  "make it so",
-  "onward",
-  "approved",
-  "permission granted",
-];
 
-export const chatSkipPhrases = new Set(
-  [
-    "cancel",
-    "skip",
-    "no",
-    "stop",
-    "negative",
-    "no thanks",
-    "no thank you",
-    "no need",
-    "no need to",
-    "don't know",
-    "do not know",
-    "not sure",
-    "not sure about that",
-    "not sure about this",
-    "confused",
-    "i dont know",
-    "i dont know about that",
-    "i dont know about this",
-  ]);
+export const closeKeywordsRegex = new RegExp(
+  constants.closeKeywords
+    .map((keyword) => `\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`)
+    .join("|"),
+  "i"
+);
 
-export const darkModeOnPhrases = new Set(
-  ["dark mode", "turn on dark mode", "dark mode on"]);
+export const analysisKeywordsRegex = new RegExp(
+  constants.analysisKeywords
+    .map((keyword) => `\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`)
+    .join("|"),
+  "i"
+);
 
-export const lightModeOnPhrases = new Set(
-  ["light mode", "turn on light mode", "light mode on"]);
-export const darkModeOffPhrases = new Set(
-  ["dark mode off", "turn off dark mode", "dark mode off"]);
-export const lightModeOffPhrases = new Set(
-  ["light mode off", "turn off light mode", "light mode off"]);
+export const proceedingTextRegex = new RegExp(
+  constants.proceedingText
+    .map((text) => `\\b${text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`)
+    .join("|"),
+  "i"
+);
+
+export const profanityWordsRegex = new RegExp(
+  constants.profanityWords
+    .map((word) => `\\b${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`)
+    .join("|"),
+  "i"
+);
+
+// Profanity filter function
+export const filterProfanity = (text) => {
+  if (!text || typeof text !== "string") {
+    return text;
+  }
+
+  // Use regex to replace profanity words with empty string
+  return text.replace(profanityWordsRegex, "").replace(/\s+/g, " ").trim();
+};
+
+// Check if text contains profanity
+export const containsProfanity = (text) => {
+  if (!text || typeof text !== "string") {
+    return false;
+  }
+
+  return profanityWordsRegex.test(text);
+};
+
+// Check if text contains open keywords
+export const containsOpenKeywords = (text) => {
+  if (!text || typeof text !== "string") {
+    return false;
+  }
+
+  return openKeywordsRegex.test(text);
+};
+
+// Check if text contains close keywords
+export const containsCloseKeywords = (text) => {
+  if (!text || typeof text !== "string") {
+    return false;
+  }
+
+  return closeKeywordsRegex.test(text);
+};
+
+// Check if text contains analysis keywords
+export const containsAnalysisKeywords = (text) => {
+  if (!text || typeof text !== "string") {
+    return false;
+  }
+
+  return analysisKeywordsRegex.test(text);
+};
+
+// Check if text contains proceeding text
+export const containsProceedingText = (text) => {
+  if (!text || typeof text !== "string") {
+    return false;
+  }
+
+  return proceedingTextRegex.test(text);
+};
 
 // Word replacements for common voice recognition mistakes
 export const WORD_REPLACEMENTS = new RegExp(
   "\\b(" +
-    [
-      "jenny",
-      "jini",
-      "ginny",
-      "jeanie",
-      "gini",
-      "jinny",
-      "genie's",
-      "genies",
-      "gini's",
-      "jeannie",
-      "gene",
-      "jeannie's",
-      "geny",
-      "jinni",
-      "djinni",
-      "djinn",
-      "rajini",
-      "chinni",
-      "jinni",
-      "chinie",
-      "ghajini",
-      "gajini",
-      "jani",
-      "sani",
-      "seni",
-    ]
+    constants.wordReplacements
       .map((word) => replace(word, /[.*+?^${}()|[\]\\]/g, "\\$&"))
       .join("|") +
     ")\\b",
   "gi"
 );
-
-// Note: transformGenieWords function is defined in util.js to avoid duplication

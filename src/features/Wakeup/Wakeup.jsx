@@ -11,7 +11,14 @@ import {
   openKeywords,
   closeKeywords,
   proceedingText,
+  filterProfanity,
+  containsProfanity,
+  containsOpenKeywords,
+  containsCloseKeywords,
+  containsAnalysisKeywords,
+  containsProceedingText,
 } from "../command.js";
+import constants from "../constants.json";
 
 import { lowerCase } from "lodash";
 
@@ -186,6 +193,26 @@ function WakeupComponent({
     const detectedSpeech = lowerCase(transcript).trim();
     if (!detectedSpeech) return;
 
+    // Filter profanity from detected speech before processing
+    const filteredSpeech = filterProfanity(detectedSpeech);
+    
+    // If profanity was detected and filtered, skip processing this transcript
+    if (containsProfanity(detectedSpeech)) {
+      console.log("Profanity detected and filtered from transcript");
+      resetTranscript();
+      return;
+    }
+
+    // Check for open keywords using RegExp
+    const hasOpenKeyword = containsOpenKeywords(detectedSpeech);
+
+    // If open keyword is detected, process it immediately
+    if (hasOpenKeyword) {
+      console.log("Open keyword detected:", detectedSpeech);
+      processSpeech(filteredSpeech);
+      return;
+    }
+
     // Ignore system phrases
     const systemPhrasesRegex = new RegExp(
       systemPhrases
@@ -194,12 +221,12 @@ function WakeupComponent({
       "i"
     );
 
-    if (systemPhrasesRegex.test(detectedSpeech)) {
+    if (systemPhrasesRegex.test(filteredSpeech)) {
       resetTranscript();
       return;
     }
 
-    accumulatedTranscript.current = detectedSpeech;
+    accumulatedTranscript.current = filteredSpeech;
 
     if (silenceTimeout.current) {
       clearTimeout(silenceTimeout.current);
@@ -226,15 +253,22 @@ function WakeupComponent({
     setIsProcessing(true);
     resetTranscript();
 
-    // Immediate keyword matching without complex operations
-    const lowerTranscript = lowerCase(fullTranscript);
+    // Filter profanity from the full transcript
+    const filteredTranscript = filterProfanity(fullTranscript);
+    
+    // If profanity was detected, skip processing
+    if (containsProfanity(fullTranscript)) {
+      console.log("Profanity detected in full transcript, skipping processing");
+      setIsProcessing(false);
+      return;
+    }
 
-    // Quick check for open keywords
-    const openKeywordRegex = new RegExp(
-      Array.from(openKeywords).join("|"),
-      "i"
-    );
-    const hasOpenKeyword = openKeywordRegex.test(lowerTranscript);
+    // Immediate keyword matching without complex operations
+    const lowerTranscript = lowerCase(filteredTranscript);
+
+    // Quick check for open keywords using RegExp
+    const hasOpenKeyword = containsOpenKeywords(lowerTranscript);
+    
     if (hasOpenKeyword) {
       if (!hasBeenWoken && !showHome) {
         audioToPlay(genieIcons?.whatCanDoAudio);
@@ -250,12 +284,9 @@ function WakeupComponent({
       }
     }
 
-    // Quick check for close keywords
-    const closeKeywordRegex = new RegExp(
-      Array.from(closeKeywords).join("|"),
-      "i"
-    );
-    const hasCloseKeyword = closeKeywordRegex.test(lowerTranscript);
+    // Quick check for close keywords using RegExp
+    const hasCloseKeyword = containsCloseKeywords(lowerTranscript);
+    
     if ((wakeup || showHome) && hasCloseKeyword) {
       audioToPlay(genieIcons?.okAudio);
       dispatch(
@@ -280,14 +311,10 @@ function WakeupComponent({
       return;
     }
 
-    // Quick check for analysis keywords
+    // Quick check for analysis keywords using RegExp
     if (wakeup && fullTranscript && awaitingNextCommand) {
       setAwaitingNextCommand(false);
-      const analysisKeywordRegex = new RegExp(
-        Array.from(analysisKeywords).join("|"),
-        "i"
-      );
-      const hasAnalysisKeyword = analysisKeywordRegex.test(lowerTranscript);
+      const hasAnalysisKeyword = containsAnalysisKeywords(lowerTranscript);
 
       if (hasAnalysisKeyword) {
         audioToPlay(genieIcons?.sureAudio);
@@ -307,13 +334,13 @@ function WakeupComponent({
           setHasBeenWoken(false);
           dispatch(
             updateChat({
-              userCommand: fullTranscript,
+              userCommand: filteredTranscript,
             })
           );
           // Store the voice prompt in search state for VoiceRecognition to use
           dispatch(
             updateSearch({
-              searchInput: fullTranscript,
+              searchInput: filteredTranscript,
             })
           );
         }, 300);
@@ -350,8 +377,8 @@ function WakeupComponent({
 
     if (awaitingProceedResponse && fullTranscript) {
       setAwaitingProceedResponse(false);
-      const proceedingTextRegex = new RegExp(proceedingText.join("|"), "i");
-      const isProceeding = proceedingTextRegex.test(lowerTranscript);
+      const isProceeding = containsProceedingText(lowerTranscript);
+      
       if (isProceeding) {
         resetTranscript();
         audioToPlay(genieIcons?.proceedingAudio);

@@ -15,6 +15,7 @@ import {
   updateSearch,
   updateSettings,
 } from "Reducers/genie/reducer";
+import { filterProfanity, containsProfanity } from "../../features/command.js";
 
 // Constants
 const FILE_TYPES = ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx";
@@ -83,7 +84,16 @@ function GeniePromptBox({
 
   // Helper functions
   const handleSearch = () => {
-    handleFormSubmit(searchInputData?.trim());
+    const inputText = searchInputData?.trim();
+    
+    // Filter profanity from input before submitting
+    if (inputText && containsProfanity(inputText)) {
+      console.log("Profanity detected in manual input, filtering before submission");
+      const filteredInput = filterProfanity(inputText);
+      handleFormSubmit(filteredInput);
+    } else {
+      handleFormSubmit(inputText);
+    }
   };
 
   const handleRemoveFile = (idToRemove) => {
