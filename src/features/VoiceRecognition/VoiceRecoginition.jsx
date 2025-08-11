@@ -50,6 +50,7 @@ const VoiceRecognition = ({ onFormSubmit = () => {}, onResumeListening = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [isUserTyping, setIsUserTyping] = useState(false);
   const [originalTranscript, setOriginalTranscript] = useState("");
+  const [isNewSession, setIsNewSession] = useState(true); // Track if this is a new session
   const SILENCE_LIMIT_MS = 5000; // Stop listening after 5s of silence
   const silenceTimerRef = useRef(null);
   const debounceDelay = 2000; // 2 seconds to wait after last speech before auto-submit
@@ -91,40 +92,65 @@ const VoiceRecognition = ({ onFormSubmit = () => {}, onResumeListening = () => {
   };
 
   const startListening = () => {
-    resetTranscript();
-    setHasStartedSpeaking(false);
-    setValue("searchInput", "");
-    setIsInitialized(false);
-    setIsUserTyping(false);
-    setOriginalTranscript("");
-
-    // Clear any stored searchInput to prevent repeated submission
-    dispatch(updateSearch({ searchInput: "" }));
-
-    if (!browserSupportsSpeechRecognition) {
-      updateChatState({
-        errorTranscript:
-          "Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari.",
-      });
-      updateSpeechState({
-        isListening: false,
-        inputVoiceSearch: false,
-      });
-      return;
+    console.log("Starting new listening session, clearing all transcript state");
+    
+    // More aggressive transcript clearing
+    try {
+      resetTranscript();
+      // Force clear any remaining transcript by accessing the recognition object directly
+      if (browserSupportsSpeechRecognition && typeof SpeechRecognition.getRecognition === "function") {
+        const recognition = SpeechRecognition.getRecognition();
+        if (recognition && recognition.abort) {
+          recognition.abort();
+        }
+      }
+    } catch (error) {
+      console.log("Error clearing transcript:", error);
     }
-    SpeechRecognition.startListening(continuousListeningOptions);
-    updateSpeechState({
-      isListening: true,
-    });
-    clearTimeout(debounceTimeout);
-
-    // Set initialized flag after a short delay to prevent immediate auto-submission
+    
+    // Wait a bit for transcript to clear before proceeding
     setTimeout(() => {
-      setIsInitialized(true);
-    }, 1000);
+      // Double-check that transcript is cleared
+      if (transcript && transcript.trim()) {
+        console.log("Transcript still exists after clearing, aborting start:", transcript);
+        return;
+      }
+      
+      setHasStartedSpeaking(false);
+      setValue("searchInput", "");
+      setIsInitialized(false);
+      setIsUserTyping(false);
+      setOriginalTranscript("");
+      setIsNewSession(true); // Mark this as a new session
 
-    // Start silence timer even if the user hasn't spoken yet
-    resetSilenceTimer();
+      // Clear any stored searchInput to prevent repeated submission
+      dispatch(updateSearch({ searchInput: "" }));
+
+      if (!browserSupportsSpeechRecognition) {
+        updateChatState({
+          errorTranscript:
+            "Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari.",
+        });
+        updateSpeechState({
+          isListening: false,
+          inputVoiceSearch: false,
+        });
+        return;
+      }
+      SpeechRecognition.startListening(continuousListeningOptions);
+      updateSpeechState({
+        isListening: true,
+      });
+      clearTimeout(debounceTimeout);
+
+      // Set initialized flag after a short delay to prevent immediate auto-submission
+      setTimeout(() => {
+        setIsInitialized(true);
+      }, 1000);
+
+      // Start silence timer even if the user hasn't spoken yet
+      resetSilenceTimer();
+    }, 100); // Small delay to ensure transcript clearing
   };
 
   const stopListening = () => {
@@ -170,6 +196,9 @@ const VoiceRecognition = ({ onFormSubmit = () => {}, onResumeListening = () => {
         }, 1000);
       }
     }
+    
+    // Reset new session flag when stopping
+    setIsNewSession(true);
   };
 
   const handleSpeechRecognitionError = (event) => {
@@ -225,6 +254,7 @@ const VoiceRecognition = ({ onFormSubmit = () => {}, onResumeListening = () => {
     resetTranscript();
     setHasStartedSpeaking(false);
     setIsSubmitting(false);
+    setIsNewSession(true); // Initialize as new session
 
     // Don't initialize with stored searchInput to prevent repeated submission
     // Clear any existing input to start fresh
@@ -274,7 +304,8 @@ const VoiceRecognition = ({ onFormSubmit = () => {}, onResumeListening = () => {
     }
 
     // Bind transcript to input field in real-time
-    if (transcript) {
+    if (transcript && !isNewSession && isInitialized) { // Only process transcript if not a new session and initialized
+      console.log("Processing transcript:", transcript, "isNewSession:", isNewSession, "isInitialized:", isInitialized);
       // Filter profanity from transcript before processing
       const filteredTranscript = filterProfanity(transcript);
 
@@ -305,6 +336,14 @@ const VoiceRecognition = ({ onFormSubmit = () => {}, onResumeListening = () => {
           setValue("searchInput", correctedTranscript);
         }
       }
+    } else if (transcript && isNewSession) {
+      // If we have a transcript and it's a new session, mark the session as started
+      // This prevents old transcripts from being processed
+      console.log("New session with transcript, marking session as started:", transcript);
+      // Add a small delay to ensure proper session initialization
+      setTimeout(() => {
+        setIsNewSession(false);
+      }, 100);
     }
 
     // Reset 5s silence timer on any transcript change while listening
@@ -323,6 +362,9 @@ const VoiceRecognition = ({ onFormSubmit = () => {}, onResumeListening = () => {
     debounceDelay,
     isSubmitting,
     isInitialized,
+    isNewSession,
+    originalTranscript,
+    hasStartedSpeaking,
   ]);
 
   //componentWillUnmount Phase

@@ -224,6 +224,16 @@ function Genie() {
 
   const handleResumeListening = () => {
     // Resume listening after user submits edited transcript
+    // Clear any existing search input to prevent old transcripts from appearing
+    dispatch(
+      updateSearch({
+        searchInput: "",
+      })
+    );
+    
+    // Also clear the form value to ensure complete clearing
+    setValue("searchInput", "");
+    
     dispatch(
       updateSpeech({
         inputVoiceSearch: true,
