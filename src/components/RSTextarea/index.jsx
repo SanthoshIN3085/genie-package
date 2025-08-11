@@ -148,6 +148,14 @@ const RSTextarea = ({
                 ref={textareaRef}
                 placeholder={isAI ? placeholder : ""}
                 onInput={handleInput}
+                onChange={(e) => {
+                  // Call the field's onChange for react-hook-form
+                  field.onChange(e);
+                  // Call the custom onChange if provided
+                  if (rest.onChange) {
+                    rest.onChange(e);
+                  }
+                }}
                 onKeyDown={(e) => handleKeyDown(e, field)}
                 onKeyPress={rest.onKeyPress}
                 onPaste={(e) => handlePaste(e, field)}

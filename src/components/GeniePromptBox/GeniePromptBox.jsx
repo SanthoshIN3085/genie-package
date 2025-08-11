@@ -40,7 +40,7 @@ function GeniePromptBox({
 
   const { ui, speech, chat, search } = useSelector((state) => state.genie);
   const { loadingChat, isDarkMode, recommendedPrompts, activeItem } = ui;
-  const { isListening, listeningText } = speech;
+  const { isListening, listeningText, inputVoiceSearch } = speech;
   const { generateCard, errorTranscript } = chat;
   const { searchInput } = search;
   const home = activeItem === "newprompt";
@@ -94,6 +94,12 @@ function GeniePromptBox({
     } else {
       handleFormSubmit(inputText);
     }
+    
+    // Clear the input after submission
+    setValue("searchInput", "");
+    
+    // The voice recognition will be handled by the parent component
+    // after the typing animation completes
   };
 
   const handleRemoveFile = (idToRemove) => {
@@ -130,6 +136,26 @@ function GeniePromptBox({
 
   const handleInputFocus = () => {
     dispatch(updateChat({ errorTranscript: "" }));
+  };
+// update search value on input change.
+  const handleInputChange = (e) => {
+    const newValue = e.target.value;
+    // If user starts typing while listening, stop listening
+    if (isListening && newValue !== searchInput) {
+      dispatch(
+        updateSpeech({
+          isListening: false,
+          inputVoiceSearch: false,
+        })
+      );
+    }
+    
+    // Update the search input in Redux to sync with form
+    dispatch(
+      updateSearch({
+        searchInput: newValue,
+      })
+    );
   };
 
   const handleKeyPress = (e) => {
@@ -295,6 +321,7 @@ function GeniePromptBox({
               placeholder={getPlaceholderText()}
               onKeyPress={handleKeyPress}
               onFocus={handleInputFocus}
+              onChange={handleInputChange}
             />
           </div>
 

@@ -187,6 +187,13 @@ function Genie() {
           isListening: false,
         })
       );
+      
+      // Clear the search input to prevent repeated submission
+      dispatch(
+        updateSearch({
+          searchInput: "",
+        })
+      );
     }
   };
 
@@ -211,6 +218,25 @@ function Genie() {
     dispatch(
       updateSearch({
         searchInput: "",
+      })
+    );
+  };
+
+  const handleResumeListening = () => {
+    // Resume listening after user submits edited transcript
+    dispatch(
+      updateSpeech({
+        inputVoiceSearch: true,
+        isListening: true,
+      })
+    );
+  };
+
+  const handleSyncTranscript = (editedTranscript) => {
+    // Update the search input with the edited transcript
+    dispatch(
+      updateSearch({
+        searchInput: editedTranscript,
       })
     );
   };
@@ -251,6 +277,8 @@ function Genie() {
             onFormSubmit(finalText);
             // Always clear the input field after submission
           }}
+          onResumeListening={handleResumeListening}
+          onSyncTranscript={handleSyncTranscript}
         />
       ) : (
         <Wakeup

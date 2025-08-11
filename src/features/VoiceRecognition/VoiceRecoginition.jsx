@@ -22,7 +22,7 @@ import {
 } from "../command.js";
 import constants from "../constants.json";
 
-const VoiceRecognition = ({ onFormSubmit = () => {} }) => {
+const VoiceRecognition = ({ onFormSubmit = () => {}, onResumeListening = () => {}, onSyncTranscript = () => {} }) => {
   const { speech, search } = useSelector((state) => state.genie);
   const { isListening, inputVoiceSearch } = speech || {};
   const { searchInput } = search || {};
@@ -48,6 +48,8 @@ const VoiceRecognition = ({ onFormSubmit = () => {} }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasStartedSpeaking, setHasStartedSpeaking] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isUserTyping, setIsUserTyping] = useState(false);
+  const [originalTranscript, setOriginalTranscript] = useState("");
   const SILENCE_LIMIT_MS = 5000; // Stop listening after 5s of silence
   const silenceTimerRef = useRef(null);
   const debounceDelay = 2000; // 2 seconds to wait after last speech before auto-submit
@@ -93,6 +95,8 @@ const VoiceRecognition = ({ onFormSubmit = () => {} }) => {
     setHasStartedSpeaking(false);
     setValue("searchInput", "");
     setIsInitialized(false);
+    setIsUserTyping(false);
+    setOriginalTranscript("");
 
     // Clear any stored searchInput to prevent repeated submission
     dispatch(updateSearch({ searchInput: "" }));
@@ -134,8 +138,8 @@ const VoiceRecognition = ({ onFormSubmit = () => {} }) => {
     clearTimeout(debounceTimeout);
     clearSilenceTimer();
 
-    // Manual submission if user stops listening and there's a transcript
-    if (transcript && transcript.trim() && !isSubmitting) {
+    // Only submit if user is not typing and there's a transcript
+    if (transcript && transcript.trim() && !isSubmitting && !isUserTyping) {
       const confidence = transcript.confidence || 1.0;
       if (confidence >= 0.7) {
         setIsSubmitting(true);
@@ -242,8 +246,22 @@ const VoiceRecognition = ({ onFormSubmit = () => {} }) => {
       setTimeout(() => {
         startListening();
       }, 1000); // 1 second delay after typing finishes
+    } else if (inputVoiceSearch && !isListening && !listening && !isUserTyping) {
+      // Resume listening after user submits edited transcript
+      setTimeout(() => {
+        startListening();
+      }, 500);
     }
-  }, [inputVoiceSearch, isListening, listening]);
+  }, [inputVoiceSearch, isListening, listening, isUserTyping]);
+
+  // Watch for user typing in the input field
+  useEffect(() => {
+    if (searchInput && originalTranscript && searchInput !== originalTranscript && isListening) {
+      // User has started typing, stop listening
+      setIsUserTyping(true);
+      stopListening();
+    }
+  }, [searchInput, originalTranscript, isListening]);
 
   //componentDidUpdate Phase
   useEffect(() => {
@@ -274,6 +292,11 @@ const VoiceRecognition = ({ onFormSubmit = () => {} }) => {
       // Check if the transcript has sufficient confidence (0.7 threshold)
       const confidence = transcript.confidence || 1.0;
       if (confidence >= 0.7) {
+        // Store the original transcript for comparison
+        if (!originalTranscript) {
+          setOriginalTranscript(correctedTranscript);
+        }
+        
         // If user starts speaking again, clear the initial voice prompt
         if (!hasStartedSpeaking) {
           setHasStartedSpeaking(true);
