@@ -135,16 +135,8 @@
     "i dont know about that",
     "i dont know about this"
   ],
-  "darkModeOnPhrases": [
-    "dark mode",
-    "turn on dark mode",
-    "dark mode on"
-  ],
-  "lightModeOnPhrases": [
-    "light mode",
-    "turn on light mode",
-    "light mode on"
-  ],
+  "darkModeOnPhrases": ["dark mode", "turn on dark mode", "dark mode on"],
+  "lightModeOnPhrases": ["light mode", "turn on light mode", "light mode on"],
   "darkModeOffPhrases": [
     "dark mode off",
     "turn off dark mode",
@@ -254,6 +246,19 @@
     "asshole",
     "dick",
     "piss",
+    "pissed",
+    "pissed off",
+    "porn",
+    "pornhub",
+    "pornhub.com",
+    "pornhub dot com",
+    "pussy",
+    "damn",
+    "god damn",
+    "god damn it",
+    "damn it",
+    "shit head",
+    "shithead",
     "cock",
     "whore",
     "tits",
