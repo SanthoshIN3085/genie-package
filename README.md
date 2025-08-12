@@ -11,6 +11,8 @@ A modern React application built with Vite, featuring a well-organized project s
 - 💾 Redux for state management
 - 🎯 SCSS modules with organized structure
 - ⚡ Vite for fast development and building
+- 🔊 Advanced voice recognition with audio feedback
+- 🎵 Howler js for seamless audio management
 
 ## Project Structure
 
@@ -19,6 +21,8 @@ src/
 ├── assets/          # Static assets (images, fonts, icons)
 ├── components/      # Reusable UI components
 ├── features/        # Feature-based modules
+│   ├── VoiceRecognition/  # Voice input handling
+│   └── Wakeup/           # Wakeup command detection
 ├── pages/          # Main pages/routes
 ├── routes/         # Route definitions
 ├── hooks/          # Custom React hooks
@@ -64,6 +68,18 @@ src/
 - Redux Toolkit
 - SASS
 - ESLint
+- Howler js - Audio management and playback
+- react-speech-recognition - Voice input processing
+
+## Audio Features
+
+The application includes sophisticated audio management using Howler.js:
+
+- **Wakeup Commands**: Always-listening voice activation system
+- **Audio Feedback**: Contextual audio responses for user interactions
+- **Seamless Integration**: Audio automatically pauses speech recognition during playback
+- **Cross-browser Compatibility**: Consistent audio behavior across different browsers
+- **Performance Optimized**: Preloaded audio instances for instant playback
 
 ## Contributing
 

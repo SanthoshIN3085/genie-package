@@ -20,6 +20,12 @@ This implementation allows users to edit voice recognition transcripts in real-t
 - Maintains proper flow between voice recognition and manual input
 - Handles profanity filtering for both voice and manual input
 
+### 4. Advanced Audio Management
+- Howler js-based audio system for wakeup commands and feedback
+- Automatic speech recognition pause/resume during audio playback
+- Preloaded audio instances for instant response
+- Cross-browser audio compatibility
+
 ## Implementation Details
 
 ### Components Modified
@@ -94,6 +100,45 @@ onChange={(e) => {
 - `handleResumeListening()` - Resumes voice recognition
 - `handleSyncTranscript()` - Syncs edited transcript with state
 
+#### 5. Wakeup Component (`src/features/Wakeup/Wakeup.jsx`)
+- **Howler js Audio System**: Replaced Web Audio API with Howler.js for better cross-browser compatibility
+- **Audio Instance Management**: Preloaded audio instances for instant playback
+- **Event-Driven Audio Control**: Automatic speech recognition pause/resume during audio playback
+- **Smart State Management**: Proper handling of speaking/listening states
+
+**Howler js Implementation:**
+```javascript
+// Initialize all audio files with Howl instances
+const audioFiles = {
+  whatCanDo: genieIcons?.whatCanDoAudio,
+  ok: genieIcons?.okAudio,
+  sure: genieIcons?.sureAudio,
+  // ... more audio files
+};
+
+Object.entries(audioFiles).forEach(([key, audioFile]) => {
+  if (audioFile) {
+    audioInstances.current[key] = new Howl({
+      src: [audioFile],
+      html5: true,
+      preload: true,
+      onplay: () => {
+        isPlayingRef.current = true;
+        isSpeakingRef.current = true;
+        stopRecognition(); // Pause speech recognition
+      },
+      onend: () => {
+        isPlayingRef.current = false;
+        isSpeakingRef.current = false;
+        if (document.visibilityState === "visible" && !inputVoiceSearch) {
+          startRecognition(); // Resume speech recognition
+        }
+      }
+    });
+  }
+});
+```
+
 ### Flow Diagram
 
 ```
@@ -104,12 +149,21 @@ User edits transcript → User submits → Typing animation starts
 Typing animation completes → Listening resumes → Ready for next input
 ```
 
+**Audio Flow Integration:**
+```
+Wakeup command → Audio plays → Speech recognition pauses
+     ↓
+Audio ends → Speech recognition resumes → Ready for next command
+```
+
 ### Key Benefits
 
 1. **Improved User Experience**: Users can correct voice recognition errors without restarting
 2. **Seamless Workflow**: No interruption in the conversation flow
 3. **Flexible Input**: Supports both voice and manual input seamlessly
 4. **State Consistency**: Maintains synchronization between all components
+5. **Professional Audio**: High-quality audio feedback with Howler.js
+6. **Cross-browser Compatibility**: Consistent audio behavior across different browsers
 
 ### Technical Implementation
 
@@ -117,16 +171,47 @@ Typing animation completes → Listening resumes → Ready for next input
 - Uses Redux for global state management
 - Local component state for typing detection
 - Proper cleanup and reset mechanisms
+- Audio state management (playing, speaking, listening)
 
 #### Event Handling
 - Input change events trigger listening stop
 - Form submission triggers listening resume
 - Proper debouncing and timing controls
+- Audio event handling (play, end, stop, error)
+
+#### Audio Management with Howler.js
+- **Preloading**: All audio files are preloaded for instant playback
+- **Event Handling**: Comprehensive audio lifecycle management
+- **State Synchronization**: Audio states are properly synchronized with speech recognition
+- **Error Handling**: Graceful fallbacks for audio failures
+- **Memory Management**: Proper cleanup of audio instances
 
 #### Error Handling
 - Graceful fallbacks for unsupported browsers
 - Proper cleanup on component unmount
 - Error state management
+- Audio error recovery and fallback mechanisms
+
+## Audio System Architecture
+
+### Howler.js Integration
+The application uses Howler.js for robust audio management:
+
+1. **Audio Initialization**: All audio files are loaded and cached on component mount
+2. **Event-Driven Control**: Audio events automatically manage speech recognition states
+3. **Performance Optimization**: Preloaded instances ensure instant playback
+4. **Cross-browser Support**: Consistent behavior across Chrome, Firefox, Safari, and Edge
+
+### Audio States
+- **Loading**: Audio files are being fetched and decoded
+- **Playing**: Audio is currently playing, speech recognition paused
+- **Ended**: Audio finished, speech recognition resumes
+- **Error**: Audio failed, fallback to speech recognition
+
+### Audio Files
+- **Wakeup Responses**: Contextual audio feedback for different commands
+- **Status Indicators**: Audio cues for system states
+- **User Guidance**: Helpful audio prompts for user interaction
 
 ## Usage
 
@@ -135,6 +220,7 @@ Typing animation completes → Listening resumes → Ready for next input
 2. If the transcript has errors, click in the input field and edit
 3. Press Enter or click Send to submit
 4. The system will process your request and resume listening
+5. Audio feedback provides context for all interactions
 
 ### For Developers
 The implementation follows React best practices:
@@ -142,6 +228,7 @@ The implementation follows React best practices:
 - Implements proper cleanup
 - Maintains component separation of concerns
 - Uses callbacks for parent-child communication
+- Howler.js for professional audio management
 
 ## Future Enhancements
 
@@ -149,6 +236,8 @@ The implementation follows React best practices:
 2. **Voice Commands**: Voice commands for editing (e.g., "correct that to...")
 3. **History**: Save edited transcripts for learning
 4. **Confidence Display**: Show confidence scores for transcript accuracy
+5. **Audio Customization**: User-configurable audio feedback
+6. **Multi-language Audio**: Support for different language audio responses
 
 ## Testing
 
@@ -158,6 +247,9 @@ The implementation has been tested for:
 - ✅ State synchronization
 - ✅ Event handling
 - ✅ Error scenarios
+- ✅ Audio playback and management
+- ✅ Cross-browser audio compatibility
+- ✅ Speech recognition integration with audio
 
 ## Dependencies
 
@@ -165,3 +257,5 @@ The implementation has been tested for:
 - Redux for state management
 - react-hook-form for form handling
 - react-speech-recognition for voice input
+- **Howler js** for audio management and playback
+- **Lodash** for utility functions

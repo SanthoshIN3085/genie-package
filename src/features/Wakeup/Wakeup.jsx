@@ -4,7 +4,12 @@ import SpeechRecognition, {
 } from "react-speech-recognition";
 import * as genieIcons from "../../assets/genieIcons";
 import { useDispatch, useSelector } from "react-redux";
-import { updateChat, updateSpeech, updateSearch, updateUI } from "Reducers/genie/reducer";
+import {
+  updateChat,
+  updateSpeech,
+  updateSearch,
+  updateUI,
+} from "Reducers/genie/reducer";
 import {
   systemPhrases,
   analysisKeywords,
@@ -19,12 +24,12 @@ import {
   containsProceedingText,
 } from "../command.js";
 import constants from "../constants.json";
-
+import { Howl, Howler } from "howler";
 import { lowerCase } from "lodash";
 
 /**
  * WakeupComponent - Always listening for wakeup commands
- * 
+ *
  * Behavior:
  * 1. Always starts listening when component mounts
  * 2. Stops listening when VoiceRecognition starts (inputVoiceSearch = true)
@@ -48,6 +53,7 @@ function WakeupComponent({
     listening,
     browserSupportsSpeechRecognition,
   } = useSpeechRecognition();
+  const [audioInitialized, setAudioInitialized] = useState(false);
   const [hasBeenWoken, setHasBeenWoken] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [awaitingNextCommand, setAwaitingNextCommand] = useState(false);
@@ -55,52 +61,133 @@ function WakeupComponent({
   const silenceTimeout = useRef(null);
   const accumulatedTranscript = useRef("");
   const isSpeakingRef = useRef(false);
-  const audioContext = useRef(null);
-  const audioBuffer = useRef(null);
+  const audioInstances = useRef({});
   const isPlayingRef = useRef(false);
-  const initAudioContext = () => {
-    if (!audioContext.current) {
-      audioContext.current = new (window.AudioContext ||
-        window.webkitAudioContext)();
-    }
-  };
+
+  // Initialize Howler audio instances
+  useEffect(() => {
+    const initAudio = () => {
+      try {
+        // Initialize all audio files
+        const audioFiles = {
+          whatCanDo: genieIcons?.whatCanDoAudio,
+          ok: genieIcons?.okAudio,
+          sure: genieIcons?.sureAudio,
+          couldNotAssist: genieIcons?.couldNotAssistAudio,
+          wouldYouLike: genieIcons?.wouldYouLikeAudio,
+          proceeding: genieIcons?.proceedingAudio,
+          checkGenie: genieIcons?.checkGenieAudio,
+          closingNow: genieIcons?.Closingnow,
+        };
+
+        // Create Howl instances for each audio file
+        Object.entries(audioFiles).forEach(([key, audioFile]) => {
+          if (audioFile) {
+            audioInstances.current[key] = new Howl({
+              src: [audioFile],
+              html5: true,
+              preload: true,
+              onload: () => {
+                 console.log(`Audio loaded: ${key}`);
+              },
+              onloaderror: (id, error) => {
+                console.error(`Audio load error for ${key}:`, error);
+              },
+              onplay: () => {
+                // console.log(`Audio playing: ${key}`);
+                isPlayingRef.current = true;
+                isSpeakingRef.current = true;
+              },
+              onend: () => {
+                // console.log(`Audio ended: ${key}`);
+                isPlayingRef.current = false;
+                isSpeakingRef.current = false;
+                // Resume speech recognition after audio finishes
+                if (document.visibilityState === "visible" && !inputVoiceSearch) {
+                  startRecognition();
+                }
+              },
+              onstop: () => {
+                // console.log(`Audio stopped: ${key}`);
+                isPlayingRef.current = false;
+                isSpeakingRef.current = false;
+                // Resume speech recognition after audio stops
+                if (document.visibilityState === "visible" && !inputVoiceSearch) {
+                  startRecognition();
+                }
+              },
+              onerror: (id, error) => {
+                console.error(`Audio error for ${key}:`, error);
+                isPlayingRef.current = false;
+                isSpeakingRef.current = false;
+                // Resume speech recognition on error
+                if (document.visibilityState === "visible" && !inputVoiceSearch) {
+                  startRecognition();
+                }
+              }
+            });
+          }
+        });
+
+        setAudioInitialized(true);
+        console.log("Audio instances initialized successfully");
+      } catch (error) {
+        console.error("Error initializing audio:", error);
+        setAudioInitialized(false);
+      }
+    };
+
+    initAudio();
+
+    // Cleanup function
+    return () => {
+      // Stop all audio instances
+      Object.values(audioInstances.current).forEach(howl => {
+        if (howl && typeof howl.stop === 'function') {
+          howl.stop();
+        }
+      });
+      // Clear the audio instances
+      audioInstances.current = {};
+      setAudioInitialized(false);
+    };
+  }, []);
 
   const playAudio = async (audioFile) => {
     try {
-      initAudioContext();
-
-      if (isPlayingRef.current) {
-        // Stop any currently playing audio
-        audioContext.current.close();
-        audioContext.current = new (window.AudioContext ||
-          window.webkitAudioContext)();
+      if (!audioInitialized) {
+        console.warn("Audio not initialized");
+        return;
       }
 
-      const response = await fetch(audioFile);
-      const arrayBuffer = await response.arrayBuffer();
-      audioBuffer.current = await audioContext.current.decodeAudioData(
-        arrayBuffer
-      );
+      // Find the audio instance by file path
+      const audioKey = Object.keys(audioInstances.current).find(key => {
+        const instance = audioInstances.current[key];
+        return instance && instance._src && instance._src.includes(audioFile);
+      });
 
-      const source = audioContext.current.createBufferSource();
-      source.buffer = audioBuffer.current;
-      source.connect(audioContext.current.destination);
+      if (!audioKey || !audioInstances.current[audioKey]) {
+        console.error("Audio instance not found for:", audioFile);
+        return;
+      }
 
-      isPlayingRef.current = true;
+      const howlInstance = audioInstances.current[audioKey];
 
-      source.onended = () => {
-        isPlayingRef.current = false;
-        // Resume speech recognition after audio finishes
-        if (document.visibilityState === "visible") {
-          startRecognition();
-        }
-      };
-      source.start(0);
+      // Stop any currently playing audio
+      Howler.stop();
+      
+      // Stop current recognition
+      stopRecognition();
+      
+      // Play the audio
+      howlInstance.play();
+      
     } catch (error) {
       console.error("Error playing audio:", error);
       isPlayingRef.current = false;
-      // Resume speech recognition if there's an error
-      if (document.visibilityState === "visible") {
+      isSpeakingRef.current = false;
+      // Resume speech recognition on error
+      if (document.visibilityState === "visible" && !inputVoiceSearch) {
         startRecognition();
       }
     }
@@ -116,8 +203,8 @@ function WakeupComponent({
       return;
     }
 
-    // Don't start if VoiceRecognition is active
-    if (inputVoiceSearch) {
+    // Don't start if VoiceRecognition is active or if speaking
+    if (inputVoiceSearch || isSpeakingRef.current) {
       return;
     }
 
@@ -132,10 +219,14 @@ function WakeupComponent({
         interimResults: true,
         maxAlternatives: 1,
         confidence: 0.7,
-      }).catch((err) => {
-        console.error("Recognition start error:", err);
-        setTimeout(startRecognition, 1000);
-      });
+      })
+        .then(() => {
+          console.log("Speech Recognition Started");
+        })
+        .catch((err) => {
+          console.error("Recognition start error:", err);
+          setTimeout(startRecognition, 1000);
+        });
     }
   };
 
@@ -155,14 +246,16 @@ function WakeupComponent({
       console.warn(
         "Speech recognition not supported in this browser. Please use Chrome, Edge, or Safari."
       );
-      // Don't show error automatically - only show when user tries to use microphone
-      // Just skip the speech recognition setup
     } else {
       // Always start listening when component mounts
       startRecognition();
-      
+
       const handleVisibilityChange = () => {
-        if (document.visibilityState === "visible" && !isSpeakingRef.current && !inputVoiceSearch) {
+        if (
+          document.visibilityState === "visible" &&
+          !isSpeakingRef.current &&
+          !inputVoiceSearch
+        ) {
           startRecognition();
         } else {
           stopRecognition();
@@ -180,9 +273,8 @@ function WakeupComponent({
         if (silenceTimeout.current) {
           clearTimeout(silenceTimeout.current);
         }
-        if (!isSpeakingRef.current) {
-          window.speechSynthesis.cancel();
-        }
+        // Stop all audio when component unmounts
+        Howler.stop();
       };
     }
   }, []);
@@ -195,7 +287,7 @@ function WakeupComponent({
 
     // Filter profanity from detected speech before processing
     const filteredSpeech = filterProfanity(detectedSpeech);
-    
+
     // If profanity was detected and filtered, skip processing this transcript
     if (containsProfanity(detectedSpeech)) {
       console.log("Profanity detected and filtered from transcript");
@@ -255,7 +347,7 @@ function WakeupComponent({
 
     // Filter profanity from the full transcript
     const filteredTranscript = filterProfanity(fullTranscript);
-    
+
     // If profanity was detected, skip processing
     if (containsProfanity(fullTranscript)) {
       console.log("Profanity detected in full transcript, skipping processing");
@@ -268,7 +360,7 @@ function WakeupComponent({
 
     // Quick check for open keywords using RegExp
     const hasOpenKeyword = containsOpenKeywords(lowerTranscript);
-    
+
     if (hasOpenKeyword) {
       if (!hasBeenWoken && !showHome) {
         audioToPlay(genieIcons?.whatCanDoAudio);
@@ -286,7 +378,7 @@ function WakeupComponent({
 
     // Quick check for close keywords using RegExp
     const hasCloseKeyword = containsCloseKeywords(lowerTranscript);
-    
+
     if ((wakeup || showHome) && hasCloseKeyword) {
       audioToPlay(genieIcons?.okAudio);
       dispatch(
@@ -378,7 +470,7 @@ function WakeupComponent({
     if (awaitingProceedResponse && fullTranscript) {
       setAwaitingProceedResponse(false);
       const isProceeding = containsProceedingText(lowerTranscript);
-      
+
       if (isProceeding) {
         resetTranscript();
         audioToPlay(genieIcons?.proceedingAudio);
@@ -387,10 +479,10 @@ function WakeupComponent({
         // setReachedTriggerPoint(true);
 
         handleVoiceSearch();
-        
+
         // Don't immediately enable VoiceRecognition mode - let TypingAnimation handle it
         // The TypingAnimation will trigger voice recognition after typing completes
-        
+
         // Clear the searchInput after calling handleVoiceSearch to prevent repeated submission
         dispatch(
           updateSearch({
@@ -456,30 +548,6 @@ function WakeupComponent({
       startRecognition();
     }
   }, [inputVoiceSearch]);
-
-  useEffect(() => {
-    return () => {
-      if (audioContext.current) {
-        audioContext.current.close();
-      }
-    };
-  }, []);
-  // useEffect(() => {
-  //     if (typingEnd) {
-  //         setTimeout(() => {
-  //             dispatch(
-  //                 updateSpeech({
-  //                     inputVoiceSearch: true,
-  //                     isListening: true,
-  //                     listeningText: 'Listening...',
-  //                     transcript: '',
-  //                     wakeup: false,
-  //                 }),
-  //             );
-  //         }, 2000);
-  //     }
-  //     resetTranscript();
-  // }, [typingEnd]);
 
   return <></>;
 }

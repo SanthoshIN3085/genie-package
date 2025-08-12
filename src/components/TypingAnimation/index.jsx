@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { updateChat, updateSpeech, updateUI } from "Reducers/genie/reducer";
 import * as genieIcons from "../../assets/genieIcons";
+import { Howl } from "howler";
 
 /**
  * TypingAnimation Component
@@ -10,7 +11,7 @@ import * as genieIcons from "../../assets/genieIcons";
  * 1. Shows typing animation for content
  * 2. Waits for typing to complete
  * 3. Waits 1 second after typing finishes
- * 4. Plays listening audio sound
+ * 4. Plays listening audio sound using Howler.js
  * 5. Triggers voice recognition to start listening
  * 6. Scrolls to bottom smoothly when content is displayed
  */
@@ -31,12 +32,57 @@ const TypingAnimation = ({
   const { chat } = useSelector((state) => state.genie);
   const dispatch = useDispatch();
   const hasTriggeredEnd = useRef(false);
+  const listenAudioInstance = useRef(null);
 
-  // Audio playback function
+  // Initialize Howler audio instance for listen indicator
+  useEffect(() => {
+    if (genieIcons?.listenIndicator) {
+      listenAudioInstance.current = new Howl({
+        src: [genieIcons.listenIndicator],
+        html5: true,
+        preload: true,
+        onload: () => {
+          console.log("Listen indicator audio loaded");
+        },
+        onloaderror: (id, error) => {
+          console.error("Listen indicator audio load error:", error);
+        },
+        onplay: () => {
+          // console.log("Listen indicator audio playing");
+        },
+        onend: () => {
+          // console.log("Listen indicator audio ended");
+        },
+        onerror: (id, error) => {
+          console.error("Listen indicator audio error:", error);
+        }
+      });
+    }
+
+    // Cleanup function
+    return () => {
+      if (listenAudioInstance.current) {
+        listenAudioInstance.current.stop();
+        listenAudioInstance.current = null;
+      }
+    };
+  }, []);
+
+  // Audio playback function using Howler.js
   const playAudio = async (audioFile) => {
     try {
-      const audio = new Audio(audioFile);
-      await audio.play();
+      if (audioFile === genieIcons?.listenIndicator && listenAudioInstance.current) {
+        // Use the preloaded Howler instance for listen indicator
+        listenAudioInstance.current.play();
+      } else {
+        // Fallback to creating a new Howl instance for other audio files
+        const howlInstance = new Howl({
+          src: [audioFile],
+          html5: true,
+          preload: false,
+        });
+        howlInstance.play();
+      }
     } catch (error) {
       console.error("Error playing audio:", error);
     }
@@ -74,7 +120,7 @@ const TypingAnimation = ({
           // Only trigger voice search if NOT at the last index
           if (!isLastIndex()) {
             setTimeout(() => {
-              // Play listen indicator audio
+              // Play listen indicator audio using Howler.js
               playAudio(genieIcons?.listenIndicator);
               
               dispatch(
@@ -109,7 +155,7 @@ const TypingAnimation = ({
         // Only trigger voice search if NOT at the last index
         if (!isLastIndex()) {
           setTimeout(() => {
-            // Play listen indicator audio
+            // Play listen indicator audio using Howler.js
             playAudio(genieIcons?.listenIndicator);
             
             dispatch(
@@ -165,7 +211,7 @@ const TypingAnimation = ({
           // Only trigger voice search if NOT at the last index
           if (!isLastIndex()) {
             setTimeout(() => {
-              // Play listen indicator audio
+              // Play listen indicator audio using Howler.js
               playAudio(genieIcons?.listenIndicator);
               
               dispatch(
