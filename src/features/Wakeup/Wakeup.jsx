@@ -13,10 +13,6 @@ import {
 } from "Reducers/genie/reducer";
 import {
   systemPhrases,
-  analysisKeywords,
-  openKeywords,
-  closeKeywords,
-  proceedingText,
   filterProfanity,
   containsProfanity,
   containsOpenKeywords,
@@ -24,7 +20,6 @@ import {
   containsAnalysisKeywords,
   containsProceedingText,
 } from "../command.js";
-import constants from "../constants.json";
 import { Howl, Howler } from "howler";
 import { lowerCase } from "lodash";
 
@@ -48,7 +43,7 @@ import { lowerCase } from "lodash";
  * @param {boolean} props.showHome - Whether home page is currently shown
  * @returns {JSX.Element} Empty fragment (invisible component)
  */
-function WakeupComponent({
+export default function WakeupComponent({
   setShowHome = () => {},
   handleGenieClose = () => {},
   handleNewChat = () => {},
@@ -730,5 +725,3 @@ function WakeupComponent({
 
   return <></>;
 }
-
-export default WakeupComponent;
