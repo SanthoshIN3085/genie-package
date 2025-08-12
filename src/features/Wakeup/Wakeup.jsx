@@ -1,3 +1,4 @@
+/// importing react and other libraries
 import React, { useState, useEffect, useRef } from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
@@ -36,6 +37,16 @@ import { lowerCase } from "lodash";
  * 3. Resumes listening when VoiceRecognition stops (inputVoiceSearch = false)
  * 4. Handles visibility changes to pause/resume listening
  * 5. Processes wakeup, close, and analysis keywords
+ * 6. Manages audio playback using Howler.js
+ * 7. Handles speech recognition state management
+ * 
+ * @param {Object} props - Component props
+ * @param {Function} props.setShowHome - Function to show home page
+ * @param {Function} props.handleGenieClose - Function to close Genie
+ * @param {Function} props.handleNewChat - Function to start new chat
+ * @param {Function} props.handleVoiceSearch - Function to start voice search
+ * @param {boolean} props.showHome - Whether home page is currently shown
+ * @returns {JSX.Element} Empty fragment (invisible component)
  */
 function WakeupComponent({
   setShowHome = () => {},
@@ -64,7 +75,24 @@ function WakeupComponent({
   const audioInstances = useRef({});
   const isPlayingRef = useRef(false);
 
-  // Initialize Howler audio instances
+  /**
+   * Initialize Howler audio instances for all audio files
+   * 
+   * This useEffect runs once when the component mounts and:
+   * 1. Creates Howl instances for all audio files (whatCanDo, ok, sure, etc.)
+   * 2. Sets up event handlers for audio lifecycle (load, play, end, error)
+   * 3. Preloads audio files for instant playback
+   * 4. Manages audio state synchronization with speech recognition
+   * 5. Provides cleanup function to stop and clear audio instances
+   * 
+   * Dependencies: [] (runs only once on mount)
+   * 
+   * Side Effects:
+   * - Creates multiple Howl audio instances
+   * - Sets up audio event listeners
+   * - Updates audioInitialized state
+   * - Manages audio instance cleanup on unmount
+   */
   useEffect(() => {
     const initAudio = () => {
       try {
@@ -88,7 +116,7 @@ function WakeupComponent({
               html5: true,
               preload: true,
               onload: () => {
-                 console.log(`Audio loaded: ${key}`);
+                console.log(`Audio loaded: ${key}`);
               },
               onloaderror: (id, error) => {
                 console.error(`Audio load error for ${key}:`, error);
@@ -153,6 +181,25 @@ function WakeupComponent({
     };
   }, []);
 
+  /**
+   * Play audio file using Howler.js
+   * 
+   * This function handles audio playback by:
+   * 1. Finding the correct audio instance by matching the audio file path
+   * 2. Stopping any currently playing audio to prevent overlap
+   * 3. Stopping current speech recognition during playback
+   * 4. Playing the selected audio file
+   * 5. Handling errors and resuming speech recognition if needed
+   * 
+   * @param {string} audioFile - Path to the audio file to play
+   * @returns {Promise<void>} Promise that resolves when audio starts playing
+   * 
+   * Side Effects:
+   * - Stops all currently playing audio
+   * - Stops speech recognition
+   * - Updates isPlayingRef and isSpeakingRef states
+   * - May resume speech recognition on error
+   */
   const playAudio = async (audioFile) => {
     try {
       if (!audioInitialized) {
@@ -193,10 +240,37 @@ function WakeupComponent({
     }
   };
 
+  /**
+   * Wrapper function to play audio (maintains backward compatibility)
+   * 
+   * @param {string} audioFile - Path to the audio file to play
+   */
   const audioToPlay = (audioFile) => {
     playAudio(audioFile);
   };
 
+  /**
+   * Start speech recognition for wakeup commands
+   * 
+   * This function initializes speech recognition by:
+   * 1. Checking browser support for speech recognition
+   * 2. Verifying that VoiceRecognition is not currently active
+   * 3. Ensuring the component is visible and not currently speaking
+   * 4. Starting continuous listening with specific configuration
+   * 5. Handling errors and retrying if needed
+   * 
+   * Speech Recognition Configuration:
+   * - continuous: true (keeps listening)
+   * - language: "en-IN" (Indian English)
+   * - interimResults: true (provides real-time results)
+   * - maxAlternatives: 1 (single best result)
+   * - confidence: 0.7 (70% confidence threshold)
+   * 
+   * Side Effects:
+   * - Starts browser speech recognition
+   * - Updates listening state
+   * - May retry on error after 1 second delay
+   */
   const startRecognition = () => {
     if (!browserSupportsSpeechRecognition) {
       console.warn("Speech recognition not supported in this browser.");
@@ -230,6 +304,18 @@ function WakeupComponent({
     }
   };
 
+  /**
+   * Stop speech recognition
+   * 
+   * This function stops all speech recognition activities by:
+   * 1. Checking browser support
+   * 2. Stopping the listening process
+   * 3. Aborting any pending recognition
+   * 
+   * Side Effects:
+   * - Stops browser speech recognition
+   * - Updates listening state
+   */
   const stopRecognition = () => {
     if (!browserSupportsSpeechRecognition) {
       return;
@@ -241,6 +327,23 @@ function WakeupComponent({
     SpeechRecognition.abortListening();
   };
 
+  /**
+   * Initialize speech recognition and visibility change handling
+   * 
+   * This useEffect runs once when the component mounts and:
+   * 1. Checks browser support for speech recognition
+   * 2. Starts listening for wakeup commands immediately
+   * 3. Sets up visibility change listener to pause/resume listening
+   * 4. Provides cleanup function for event listeners and recognition
+   * 
+   * Dependencies: [] (runs only once on mount)
+   * 
+   * Side Effects:
+   * - Starts speech recognition
+   * - Adds document visibility change listener
+   * - Manages cleanup on component unmount
+   * - Stops all audio playback on unmount
+   */
   useEffect(() => {
     if (!browserSupportsSpeechRecognition) {
       console.warn(
@@ -279,6 +382,24 @@ function WakeupComponent({
     }
   }, []);
 
+  /**
+   * Process speech transcript for wakeup commands
+   * 
+   * This useEffect monitors the transcript and processes speech by:
+   * 1. Filtering out profanity and system phrases
+   * 2. Accumulating speech over time with silence detection
+   * 3. Processing accumulated speech after 500ms of silence
+   * 4. Handling different types of commands (open, close, analysis)
+   * 5. Managing state transitions and audio responses
+   * 
+   * Dependencies: [transcript, listening, isProcessing]
+   * 
+   * Side Effects:
+   * - Updates accumulated transcript
+   - Sets up silence timeout
+   * - Calls processSpeech function
+   * - Manages timeout cleanup
+   */
   useEffect(() => {
     if (!listening || isProcessing || isSpeakingRef.current) return;
 
@@ -340,6 +461,26 @@ function WakeupComponent({
     };
   }, [transcript, listening, isProcessing]);
 
+  /**
+   * Process accumulated speech and execute appropriate actions
+   * 
+   * This function handles the main logic for processing user speech by:
+   * 1. Filtering profanity from the full transcript
+   * 2. Detecting and responding to open keywords (wakeup commands)
+   * 3. Handling close keywords to deactivate Genie
+   * 4. Processing analysis keywords for user commands
+   * 5. Managing proceeding responses and state transitions
+   * 6. Playing appropriate audio feedback for each action
+   * 
+   * @param {string} fullTranscript - The complete transcript to process
+   * 
+   * Side Effects:
+   * - Updates Redux state (speech, chat, search, UI)
+   * - Plays audio responses
+   * - Triggers component state changes
+   * - Calls external handler functions
+   * - Manages wakeup and command states
+   */
   const processSpeech = (fullTranscript) => {
     console.log("processSpeech called with:", fullTranscript);
     setIsProcessing(true);
@@ -517,6 +658,24 @@ function WakeupComponent({
     setIsProcessing(false);
   };
 
+  /**
+   * Auto-deactivate wakeup after 15 seconds of inactivity
+   * 
+   * This useEffect manages the wakeup timeout by:
+   * 1. Setting a 15-second timer when hasBeenWoken becomes true
+   * 2. Automatically deactivating Genie if no further interaction occurs
+   * 3. Playing closing audio and resetting all states
+   * 4. Cleaning up the timeout if component unmounts or state changes
+   * 
+   * Dependencies: [hasBeenWoken]
+   * 
+   * Side Effects:
+   * - Sets timeout for auto-deactivation
+   * - Updates Redux state (speech, UI)
+   * - Plays closing audio
+   * - Resets wakeup states
+   * - Manages timeout cleanup
+   */
   useEffect(() => {
     if (hasBeenWoken) {
       const timeout = setTimeout(() => {
@@ -538,7 +697,21 @@ function WakeupComponent({
     }
   }, [hasBeenWoken]);
 
-  // Stop listening when VoiceRecognition starts
+  /**
+   * Synchronize speech recognition with VoiceRecognition component
+   * 
+   * This useEffect manages the coordination between Wakeup and VoiceRecognition by:
+   * 1. Stopping Wakeup listening when VoiceRecognition starts
+   * 2. Resuming Wakeup listening when VoiceRecognition stops
+   * 3. Ensuring only one component is listening at a time
+   * 4. Preventing conflicts between the two listening systems
+   * 
+   * Dependencies: [inputVoiceSearch]
+   * 
+   * Side Effects:
+   * - Starts or stops speech recognition
+   * - Manages listening state transitions
+   */
   useEffect(() => {
     if (inputVoiceSearch) {
       // VoiceRecognition has started, stop Wakeup listening
