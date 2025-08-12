@@ -1,5 +1,5 @@
 /// importing react and other libraries
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -74,6 +74,46 @@ function WakeupComponent({
   const isSpeakingRef = useRef(false);
   const audioInstances = useRef({});
   const isPlayingRef = useRef(false);
+
+  /**
+   * Memoized function to update speech state in Redux
+   * 
+   * @param {Object} data - Speech state data to update
+   */
+  const updateSpeechState = useCallback(
+    (data) => dispatch(updateSpeech(data)),
+    [dispatch]
+  );
+
+  /**
+   * Memoized function to update UI state in Redux
+   * 
+   * @param {Object} data - UI state data to update
+   */
+  const updateUIState = useCallback(
+    (data) => dispatch(updateUI(data)),
+    [dispatch]
+  );
+
+  /**
+   * Memoized function to update chat state in Redux
+   * 
+   * @param {Object} data - Chat state data to update
+   */
+  const updateChatState = useCallback(
+    (data) => dispatch(updateChat(data)),
+    [dispatch]
+  );
+
+  /**
+   * Memoized function to update search state in Redux
+   * 
+   * @param {Object} data - Search state data to update
+   */
+  const updateSearchState = useCallback(
+    (data) => dispatch(updateSearch(data)),
+    [dispatch]
+  );
 
   /**
    * Initialize Howler audio instances for all audio files
@@ -506,11 +546,9 @@ function WakeupComponent({
       if (!hasBeenWoken && !showHome) {
         audioToPlay(genieIcons?.whatCanDoAudio);
         setHasBeenWoken(true);
-        dispatch(
-          updateSpeech({
-            wakeup: true,
-          })
-        );
+        updateSpeechState({
+          wakeup: true,
+        });
         setAwaitingNextCommand(true);
         setIsProcessing(false);
         return;
@@ -522,21 +560,15 @@ function WakeupComponent({
 
     if ((wakeup || showHome) && hasCloseKeyword) {
       audioToPlay(genieIcons?.okAudio);
-      dispatch(
-        updateSpeech({
-          wakeup: false,
-        })
-      );
-      dispatch(
-        updateUI({
-          showAlert: false,
-        })
-      );
-      dispatch(
-        updateChat({
-          userCommand: "",
-        })
-      );
+      updateSpeechState({
+        wakeup: false,
+      });
+      updateUIState({
+        showAlert: false,
+      });
+      updateChatState({
+        userCommand: "",
+      });
       handleGenieClose();
       setHasBeenWoken(false);
       setAwaitingNextCommand(false);
@@ -552,30 +584,22 @@ function WakeupComponent({
       if (hasAnalysisKeyword) {
         audioToPlay(genieIcons?.sureAudio);
         setTimeout(() => {
-          dispatch(
-            updateSpeech({
-              wakeup: false,
-            })
-          );
-          dispatch(
-            updateUI({
-              showAlert: false,
-            })
-          );
+          updateSpeechState({
+            wakeup: false,
+          });
+          updateUIState({
+            showAlert: false,
+          });
           setShowHome(true);
           handleNewChat();
           setHasBeenWoken(false);
-          dispatch(
-            updateChat({
-              userCommand: filteredTranscript,
-            })
-          );
+          updateChatState({
+            userCommand: filteredTranscript,
+          });
           // Store the voice prompt in search state for VoiceRecognition to use
-          dispatch(
-            updateSearch({
-              searchInput: filteredTranscript,
-            })
-          );
+          updateSearchState({
+            searchInput: filteredTranscript,
+          });
         }, 300);
 
         setTimeout(() => {
@@ -586,24 +610,18 @@ function WakeupComponent({
       } else {
         audioToPlay(genieIcons?.couldNotAssistAudio);
         setTimeout(() => {
-          dispatch(
-            updateSpeech({
-              wakeup: false,
-            })
-          );
-          dispatch(
-            updateUI({
-              showAlert: false,
-            })
-          );
+          updateSpeechState({
+            wakeup: false,
+          });
+          updateUIState({
+            showAlert: false,
+          });
           setShowHome(true);
           handleNewChat();
           setHasBeenWoken(false);
-          dispatch(
-            updateChat({
-              userCommand: "",
-            })
-          );
+          updateChatState({
+            userCommand: "",
+          });
         }, 1000);
       }
     }
@@ -625,32 +643,24 @@ function WakeupComponent({
         // The TypingAnimation will trigger voice recognition after typing completes
 
         // Clear the searchInput after calling handleVoiceSearch to prevent repeated submission
-        dispatch(
-          updateSearch({
-            searchInput: "",
-          })
-        );
+        updateSearchState({
+          searchInput: "",
+        });
       } else {
         audioToPlay(genieIcons?.checkGenieAudio);
         setTimeout(() => {
-          dispatch(
-            updateSpeech({
-              wakeup: false,
-            })
-          );
-          dispatch(
-            updateUI({
-              showAlert: false,
-            })
-          );
+          updateSpeechState({
+            wakeup: false,
+          });
+          updateUIState({
+            showAlert: false,
+          });
           setShowHome(true);
           handleNewChat();
           setHasBeenWoken(false);
-          dispatch(
-            updateChat({
-              userCommand: "",
-            })
-          );
+          updateChatState({
+            userCommand: "",
+          });
         }, 1500);
       }
     }
@@ -680,16 +690,12 @@ function WakeupComponent({
     if (hasBeenWoken) {
       const timeout = setTimeout(() => {
         setHasBeenWoken(false);
-        dispatch(
-          updateSpeech({
-            wakeup: false,
-          })
-        );
-        dispatch(
-          updateUI({
-            showAlert: false,
-          })
-        );
+        updateSpeechState({
+          wakeup: false,
+        });
+        updateUIState({
+          showAlert: false,
+        });
         audioToPlay(genieIcons?.Closingnow);
       }, 15000);
 
