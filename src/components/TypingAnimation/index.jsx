@@ -41,7 +41,8 @@ const TypingAnimation = ({
   const [isTyping, setIsTyping] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const timeoutRef = useRef(null);
-  const { chat } = useSelector((state) => state.genie);
+  const { chat, speech } = useSelector((state) => state.genie);
+  const { isAudioMode } = speech;
   const dispatch = useDispatch();
   const hasTriggeredEnd = useRef(false);
   const listenAudioInstance = useRef(null);
@@ -170,8 +171,8 @@ const TypingAnimation = ({
         scrollToBottom();
         if (!hasTriggeredEnd.current) {
           hasTriggeredEnd.current = true;
-          // Only trigger voice search if NOT at the last index
-          if (!isLastIndex()) {
+          // Only trigger voice search if NOT at the last index AND audio mode is enabled
+          if (!isLastIndex() && isAudioMode) {
             setTimeout(() => {
               // Play listen indicator audio using Howler.js
               playAudio(genieIcons?.listenIndicator);
@@ -205,8 +206,8 @@ const TypingAnimation = ({
       scrollToBottom();
       if (!hasTriggeredEnd.current) {
         hasTriggeredEnd.current = true;
-        // Only trigger voice search if NOT at the last index
-        if (!isLastIndex()) {
+        // Only trigger voice search if NOT at the last index AND audio mode is enabled
+        if (!isLastIndex() && isAudioMode) {
           setTimeout(() => {
             // Play listen indicator audio using Howler.js
             playAudio(genieIcons?.listenIndicator);
@@ -270,8 +271,8 @@ const TypingAnimation = ({
         if (!hasTriggeredEnd.current) {
           hasTriggeredEnd.current = true;
           
-          // Only trigger voice search if NOT at the last index
-          if (!isLastIndex()) {
+          // Only trigger voice search if NOT at the last index AND audio mode is enabled
+          if (!isLastIndex() && isAudioMode) {
             setTimeout(() => {
               // Play listen indicator audio using Howler.js
               playAudio(genieIcons?.listenIndicator);

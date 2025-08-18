@@ -18,7 +18,7 @@ export const initialState = {
     listeningText: "Listening...",
     isListening: false,
     isSpeaking: false,
-    isAudioMode: true,
+    isAudioMode: false,
     wakeup: false,
     inputVoiceSearch: false,
   },

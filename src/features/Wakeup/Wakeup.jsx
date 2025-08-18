@@ -18,7 +18,6 @@ import {
   containsOpenKeywords,
   containsCloseKeywords,
   containsAnalysisKeywords,
-  containsProceedingText,
 } from "../command.js";
 import { Howl, Howler } from "howler";
 import { lowerCase } from "lodash";
@@ -52,7 +51,7 @@ export default function WakeupComponent({
 }) {
   const dispatch = useDispatch();
   const { speech, ui } = useSelector((state) => state.genie);
-  const { wakeup, inputVoiceSearch } = speech || {};
+  const { wakeup, inputVoiceSearch, isAudioMode } = speech || {};
   const {
     transcript,
     resetTranscript,
@@ -69,6 +68,7 @@ export default function WakeupComponent({
   const isSpeakingRef = useRef(false);
   const audioInstances = useRef({});
   const isPlayingRef = useRef(false);
+  const isStartingRecognition = useRef(false);
 
   /**
    * Memoized function to update speech state in Redux
@@ -131,6 +131,27 @@ export default function WakeupComponent({
   useEffect(() => {
     const initAudio = () => {
       try {
+        // Don't reinitialize if already initialized
+        if (audioInitialized) {
+          return;
+        }
+
+        // Check if we're already at the audio pool limit
+        if (Object.keys(audioInstances.current).length >= 8) {
+          console.warn("Audio pool limit reached, cleaning up before reinitializing");
+          cleanupAudioInstances();
+        }
+
+        // Clear any existing instances first
+        if (Object.keys(audioInstances.current).length > 0) {
+          Object.values(audioInstances.current).forEach(howl => {
+            if (howl && typeof howl.stop === 'function') {
+              howl.stop();
+            }
+          });
+          audioInstances.current = {};
+        }
+
         // Initialize all audio files
         const audioFiles = {
           whatCanDo: genieIcons?.whatCanDoAudio,
@@ -138,62 +159,59 @@ export default function WakeupComponent({
           sure: genieIcons?.sureAudio,
           couldNotAssist: genieIcons?.couldNotAssistAudio,
           wouldYouLike: genieIcons?.wouldYouLikeAudio,
-          proceeding: genieIcons?.proceedingAudio,
+         // proceeding: genieIcons?.proceedingAudio,
           checkGenie: genieIcons?.checkGenieAudio,
           closingNow: genieIcons?.closingNowAudio,
         };
 
-        // Create Howl instances for each audio file
+        // Create Howl instances for each audio file with better error handling
         Object.entries(audioFiles).forEach(([key, audioFile]) => {
           if (audioFile) {
-            audioInstances.current[key] = new Howl({
-              src: [audioFile],
-              html5: true,
-              preload: true,
-              onload: () => {
-                console.log(`Audio loaded: ${key}`);
-              },
-              onloaderror: (id, error) => {
-                console.error(`Audio load error for ${key}:`, error);
-              },
-              onplay: () => {
-                // console.log(`Audio playing: ${key}`);
-                isPlayingRef.current = true;
-                isSpeakingRef.current = true;
-              },
-              onend: () => {
-                // console.log(`Audio ended: ${key}`);
-                isPlayingRef.current = false;
-                isSpeakingRef.current = false;
-                // Resume speech recognition after audio finishes
-                if (document.visibilityState === "visible" && !inputVoiceSearch) {
-                  startRecognition();
+            try {
+              audioInstances.current[key] = new Howl({
+                src: [audioFile],
+                html5: true,
+                preload: false, // Changed to false to prevent pool exhaustion
+                onloaderror: (id, error) => {
+                  console.error(`Audio load error for ${key}:`, error);
+                },
+                onplay: () => {
+                  isPlayingRef.current = true;
+                  isSpeakingRef.current = true;
+                },
+                onend: () => {
+                  isPlayingRef.current = false;
+                  isSpeakingRef.current = false;
+                  // Resume speech recognition after audio finishes
+                  if (document.visibilityState === "visible" && !inputVoiceSearch) {
+                    startRecognition();
+                  }
+                },
+                onstop: () => {
+                  isPlayingRef.current = false;
+                  isSpeakingRef.current = false;
+                  // Resume speech recognition after audio stops
+                  if (document.visibilityState === "visible" && !inputVoiceSearch) {
+                    startRecognition();
+                  }
+                },
+                onerror: (id, error) => {
+                  console.error(`Audio error for ${key}:`, error);
+                  isPlayingRef.current = false;
+                  isSpeakingRef.current = false;
+                  // Resume speech recognition on error
+                  if (document.visibilityState === "visible" && !inputVoiceSearch) {
+                    startRecognition();
+                  }
                 }
-              },
-              onstop: () => {
-                // console.log(`Audio stopped: ${key}`);
-                isPlayingRef.current = false;
-                isSpeakingRef.current = false;
-                // Resume speech recognition after audio stops
-                if (document.visibilityState === "visible" && !inputVoiceSearch) {
-                  startRecognition();
-                }
-              },
-              onerror: (id, error) => {
-                console.error(`Audio error for ${key}:`, error);
-                isPlayingRef.current = false;
-                isSpeakingRef.current = false;
-                // Resume speech recognition on error
-                if (document.visibilityState === "visible" && !inputVoiceSearch) {
-                  startRecognition();
-                }
-              }
-            });
+              });
+            } catch (audioError) {
+              console.error(`Error creating audio instance for ${key}:`, audioError);
+            }
           }
         });
 
         setAudioInitialized(true);
-        console.log("Audio instances initialized successfully");
       } catch (error) {
         console.error("Error initializing audio:", error);
         setAudioInitialized(false);
@@ -204,15 +222,7 @@ export default function WakeupComponent({
 
     // Cleanup function
     return () => {
-      // Stop all audio instances
-      Object.values(audioInstances.current).forEach(howl => {
-        if (howl && typeof howl.stop === 'function') {
-          howl.stop();
-        }
-      });
-      // Clear the audio instances
-      audioInstances.current = {};
-      setAudioInitialized(false);
+      cleanupAudioInstances();
     };
   }, []);
 
@@ -238,7 +248,6 @@ export default function WakeupComponent({
   const playAudio = async (audioFile) => {
     try {
       if (!audioInitialized) {
-        console.warn("Audio not initialized");
         return;
       }
 
@@ -261,8 +270,16 @@ export default function WakeupComponent({
       // Stop current recognition
       stopRecognition();
       
-      // Play the audio
-      howlInstance.play();
+      // Check if the audio instance is ready to play
+      if (howlInstance.state() === 'loaded') {
+        howlInstance.play();
+      } else {
+        // If not loaded, try to load it first
+        howlInstance.load();
+        howlInstance.once('load', () => {
+          howlInstance.play();
+        });
+      }
       
     } catch (error) {
       console.error("Error playing audio:", error);
@@ -282,6 +299,37 @@ export default function WakeupComponent({
    */
   const audioToPlay = (audioFile) => {
     playAudio(audioFile);
+  };
+
+  /**
+   * Clean up audio instances to prevent pool exhaustion
+   */
+  const cleanupAudioInstances = () => {
+    try {
+      // Stop all currently playing audio
+      Howler.stop();
+      
+      // Stop and unload all audio instances
+      Object.values(audioInstances.current).forEach(howl => {
+        if (howl && typeof howl.stop === 'function') {
+          howl.stop();
+        }
+        if (howl && typeof howl.unload === 'function') {
+          howl.unload();
+        }
+      });
+      
+      // Clear the references
+      audioInstances.current = {};
+      setAudioInitialized(false);
+      
+      // Force garbage collection hint (optional)
+      if (window.gc) {
+        window.gc();
+      }
+    } catch (error) {
+      console.error("Error cleaning up audio instances:", error);
+    }
   };
 
   /**
@@ -308,35 +356,56 @@ export default function WakeupComponent({
    */
   const startRecognition = () => {
     if (!browserSupportsSpeechRecognition) {
-      console.warn("Speech recognition not supported in this browser.");
+      // console.warn("Speech recognition not supported in this browser.");
       return;
     }
 
     // Don't start if VoiceRecognition is active or if speaking
     if (inputVoiceSearch || isSpeakingRef.current) {
+      //console.log("startRecognition blocked: inputVoiceSearch=", inputVoiceSearch, "isSpeaking=", isSpeakingRef.current);
       return;
     }
 
-    if (
-      !listening &&
-      !isSpeakingRef.current &&
-      document.visibilityState === "visible"
-    ) {
-      SpeechRecognition.startListening({
-        continuous: true,
-        language: "en-IN",
-        interimResults: true,
-        maxAlternatives: 1,
-        confidence: 0.7,
-      })
-        .then(() => {
-          console.log("Speech Recognition Started");
-        })
-        .catch((err) => {
-          console.error("Recognition start error:", err);
-          setTimeout(startRecognition, 1000);
-        });
+    // Don't start if already listening
+    if (listening) {
+      //console.log("startRecognition blocked: already listening");
+      return;
     }
+
+    // Don't start if not visible
+    if (document.visibilityState !== "visible") {
+      // console.log("startRecognition blocked: not visible");
+      return;
+    }
+
+    // Add a flag to prevent multiple simultaneous start attempts
+    if (isStartingRecognition.current) {
+      // console.log("startRecognition blocked: already starting");
+      return;
+    }
+
+    // console.log("startRecognition: starting new recognition session");
+    isStartingRecognition.current = true;
+
+    SpeechRecognition.startListening({
+      continuous: true,
+      language: "en-IN",
+      interimResults: true,
+      maxAlternatives: 1,
+      confidence: 0.7,
+    })
+      .then(() => {
+        // console.log("Speech Recognition Started");
+        isStartingRecognition.current = false;
+      })
+      .catch((err) => {
+        console.error("Recognition start error:", err);
+        isStartingRecognition.current = false;
+        // Only retry if we're still supposed to be listening
+        if (!inputVoiceSearch && !isSpeakingRef.current && document.visibilityState === "visible") {
+          setTimeout(startRecognition, 1000);
+        }
+      });
   };
 
   /**
@@ -355,6 +424,9 @@ export default function WakeupComponent({
     if (!browserSupportsSpeechRecognition) {
       return;
     }
+
+    // Reset the starting flag
+    isStartingRecognition.current = false;
 
     if (listening) {
       SpeechRecognition.stopListening();
@@ -381,9 +453,9 @@ export default function WakeupComponent({
    */
   useEffect(() => {
     if (!browserSupportsSpeechRecognition) {
-      console.warn(
-        "Speech recognition not supported in this browser. Please use Chrome, Edge, or Safari."
-      );
+      // console.warn(
+      //   "Speech recognition not supported in this browser. Please use Chrome, Edge, or Safari."
+      // );
     } else {
       // Always start listening when component mounts
       startRecognition();
@@ -411,8 +483,10 @@ export default function WakeupComponent({
         if (silenceTimeout.current) {
           clearTimeout(silenceTimeout.current);
         }
-        // Stop all audio when component unmounts
-        Howler.stop();
+        // Reset recognition state
+        isStartingRecognition.current = false;
+        // Clean up audio instances properly
+        cleanupAudioInstances();
       };
     }
   }, []);
@@ -446,7 +520,7 @@ export default function WakeupComponent({
 
     // If profanity was detected and filtered, skip processing this transcript
     if (containsProfanity(detectedSpeech)) {
-      console.log("Profanity detected and filtered from transcript");
+      // console.log("Profanity detected and filtered from transcript");
       resetTranscript();
       return;
     }
@@ -456,7 +530,7 @@ export default function WakeupComponent({
 
     // If open keyword is detected, process it immediately
     if (hasOpenKeyword) {
-      console.log("Open keyword detected:", detectedSpeech);
+      // console.log("Open keyword detected:", detectedSpeech);
       processSpeech(filteredSpeech);
       return;
     }
@@ -483,7 +557,7 @@ export default function WakeupComponent({
     // Reduce timeout to 1 second for faster response
     silenceTimeout.current = setTimeout(() => {
       if (accumulatedTranscript.current) {
-        console.log("Processing transcript:", accumulatedTranscript.current);
+        // console.log("Processing transcript:", accumulatedTranscript.current);
         processSpeech(accumulatedTranscript.current);
         accumulatedTranscript.current = "";
       }
@@ -517,7 +591,7 @@ export default function WakeupComponent({
    * - Manages wakeup and command states
    */
   const processSpeech = (fullTranscript) => {
-    console.log("processSpeech called with:", fullTranscript);
+    // console.log("processSpeech called with:", fullTranscript);
     setIsProcessing(true);
     resetTranscript();
 
@@ -526,7 +600,7 @@ export default function WakeupComponent({
 
     // If profanity was detected, skip processing
     if (containsProfanity(fullTranscript)) {
-      console.log("Profanity detected in full transcript, skipping processing");
+      // console.log("Profanity detected in full transcript, skipping processing");
       setIsProcessing(false);
       return;
     }
@@ -581,10 +655,13 @@ export default function WakeupComponent({
         setTimeout(() => {
           updateSpeechState({
             wakeup: false,
+            isAudioMode: !isAudioMode, //Toggle Audio Mode
           });
           updateUIState({
             showAlert: false,
           });
+          
+          handleVoiceSearch();
           setShowHome(true);
           handleNewChat();
           setHasBeenWoken(false);
@@ -595,12 +672,13 @@ export default function WakeupComponent({
           updateSearchState({
             searchInput: filteredTranscript,
           });
+          
         }, 300);
 
         setTimeout(() => {
-          audioToPlay(genieIcons?.wouldYouLikeAudio);
+          // audioToPlay(genieIcons?.wouldYouLikeAudio);
           resetTranscript();
-          setAwaitingProceedResponse(true);
+          // setAwaitingProceedResponse(true);
         }, 1500);
       } else {
         audioToPlay(genieIcons?.couldNotAssistAudio);
@@ -618,45 +696,6 @@ export default function WakeupComponent({
             userCommand: "",
           });
         }, 1000);
-      }
-    }
-
-    if (awaitingProceedResponse && fullTranscript) {
-      setAwaitingProceedResponse(false);
-      const isProceeding = containsProceedingText(lowerTranscript);
-
-      if (isProceeding) {
-        resetTranscript();
-        audioToPlay(genieIcons?.proceedingAudio);
-        //after 1500ms, start listening again triggering voice recognition's startlistening so that it displays speak now and bind user input transcript
-
-        // setReachedTriggerPoint(true);
-
-        handleVoiceSearch();
-
-        // Don't immediately enable VoiceRecognition mode - let TypingAnimation handle it
-        // The TypingAnimation will trigger voice recognition after typing completes
-
-        // Clear the searchInput after calling handleVoiceSearch to prevent repeated submission
-        updateSearchState({
-          searchInput: "",
-        });
-      } else {
-        audioToPlay(genieIcons?.checkGenieAudio);
-        setTimeout(() => {
-          updateSpeechState({
-            wakeup: false,
-          });
-          updateUIState({
-            showAlert: false,
-          });
-          setShowHome(true);
-          handleNewChat();
-          setHasBeenWoken(false);
-          updateChatState({
-            userCommand: "",
-          });
-        }, 1500);
       }
     }
 
@@ -703,7 +742,7 @@ export default function WakeupComponent({
    * 
    * This useEffect manages the coordination between Wakeup and VoiceRecognition by:
    * 1. Stopping Wakeup listening when VoiceRecognition starts
-   * 2. Resuming Wakeup listening when VoiceRecognition stops
+   * 2. Resuming Wakeup listening when VoiceRecognition stops (with delay)
    * 3. Ensuring only one component is listening at a time
    * 4. Preventing conflicts between the two listening systems
    * 
@@ -712,14 +751,28 @@ export default function WakeupComponent({
    * Side Effects:
    * - Starts or stops speech recognition
    * - Manages listening state transitions
+   * - Adds delay to prevent restart loops
    */
   useEffect(() => {
     if (inputVoiceSearch) {
       // VoiceRecognition has started, stop Wakeup listening
+      // console.log("Wakeup: VoiceRecognition started, stopping Wakeup listening");
       stopRecognition();
     } else if (!inputVoiceSearch && !isSpeakingRef.current) {
       // VoiceRecognition has stopped, resume Wakeup listening if not speaking
-      startRecognition();
+      // console.log("Wakeup: VoiceRecognition stopped, scheduling Wakeup resume in 500ms");
+      // Add a delay to prevent immediate restart conflicts
+      const resumeTimeout = setTimeout(() => {
+        // Double-check conditions before starting
+        if (!inputVoiceSearch && !isSpeakingRef.current && document.visibilityState === "visible") {
+          // console.log("Wakeup: Resuming listening after VoiceRecognition stopped");
+          startRecognition();
+        } else {
+          //console.log("Wakeup: Resume blocked - conditions changed during delay");
+        }
+      }, 500); // 500ms delay to prevent restart loops
+      
+      return () => clearTimeout(resumeTimeout);
     }
   }, [inputVoiceSearch]);
 

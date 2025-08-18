@@ -362,7 +362,7 @@ const Header = ({ istextLogo = false }) => {
             // className="click-off"
           >
             <img
-              src={isAudioMode ? audioOff : audioOn}
+              src={isAudioMode ? audioOn : audioOff}
               className={`genie-header__icon ${isAudioActive ? "active" : ""}`}
               onClick={() => {
                 dispatch(
