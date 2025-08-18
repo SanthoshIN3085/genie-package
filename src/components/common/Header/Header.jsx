@@ -359,7 +359,7 @@ const Header = ({ istextLogo = false }) => {
           <RSTooltip
             text={isAudioMode ? "OFF" : "ON"}
             position="bottom"
-            className="click-off"
+            // className="click-off"
           >
             <img
               src={isAudioMode ? audioOff : audioOn}
