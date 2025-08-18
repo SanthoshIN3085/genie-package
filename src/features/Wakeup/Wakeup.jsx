@@ -140,7 +140,7 @@ export default function WakeupComponent({
           wouldYouLike: genieIcons?.wouldYouLikeAudio,
           proceeding: genieIcons?.proceedingAudio,
           checkGenie: genieIcons?.checkGenieAudio,
-          closingNow: genieIcons?.Closingnow,
+          closingNow: genieIcons?.closingNowAudio,
         };
 
         // Create Howl instances for each audio file

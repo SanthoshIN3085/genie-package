@@ -88,7 +88,7 @@ function GeniePromptBox({
     
     // Filter profanity from input before submitting
     if (inputText && containsProfanity(inputText)) {
-      console.log("Profanity detected in manual input, filtering before submission");
+      // console.log("Profanity detected in manual input, filtering before submission");
       const filteredInput = filterProfanity(inputText);
       handleFormSubmit(filteredInput);
     } else {
