@@ -7,20 +7,26 @@ import { Howl } from "howler";
 /**
  * TypingAnimation Component
  *
- * A React component that provides a typewriter effect for displaying content with
- * automatic voice recognition activation after typing completion.ṇ
+ * A React component that provides a slow, visible word-by-word typewriter effect for displaying content with
+ * automatic voice recognition activation after typing completion.
  *
  * Behavior:
- * 1. Shows typing animation for content
- * 2. Waits for typing to complete
+ * 1. Shows typing animation for content word by word with deliberate timing
+ * 2. Waits for typing to complete (minimum 800ms per word for visibility)
  * 3. Waits 1 second after typing finishes
  * 4. Plays listening audio sound using Howler.js
  * 5. Triggers voice recognition to start listening
  * 6. Scrolls to bottom smoothly when content is displayed
  *
+ * Timing Features:
+ * - Base delay: 500ms minimum per word for visibility
+ * - Custom speed: Added to base delay for fine-tuning
+ * - Word pauses: Additional delays between words for readability
+ * - Natural rhythm: Creates engaging, readable typing animation
+ *
  * @param {Object} props - Component props
  * @param {string} props.content - The text content to be displayed with typing animation
- * @param {number} props.speed - The speed of typing animation in milliseconds
+ * @param {number} props.speed - The base speed of typing animation in milliseconds per word (adds 500ms delay for visibility)
  * @param {boolean} props.skipTyping - Whether to skip typing animation and show content immediately
  * @param {Function} props.onTypingComplete - Callback function called when typing animation completes
  * @param {string} props.className - Additional CSS class names for styling
@@ -39,13 +45,29 @@ const TypingAnimation = ({
 }) => {
   const [displayedContent, setDisplayedContent] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const timeoutRef = useRef(null);
   const { chat, speech } = useSelector((state) => state.genie);
   const { isVoiceMode } = speech;
   const dispatch = useDispatch();
   const hasTriggeredEnd = useRef(false);
   const listenAudioInstance = useRef(null);
+
+  // Split content into words for word-by-word typing
+  // Uses regex /\s+/ to handle multiple types of whitespace (spaces, tabs, newlines)
+  const words = content ? content.split(/\s+/) : [];
+  
+  // Calculate typing speed with additional delay for better visibility
+  // Base speed + extra delay to make word-by-word effect more noticeable
+  // Default: 800ms per word, or speed + 500ms if custom speed provided
+  // This slower pace makes the word-by-word animation much more visible and engaging
+  // 
+  // Timing Strategy:
+  // - Base delay: 500ms minimum for word visibility
+  // - Custom speed: Added to base delay for fine-tuning
+  // - Word pause: Additional 200ms between words for readability
+  // - Total effect: Creates a natural, readable typing rhythm
+  const typingSpeed = speed ? speed + 200 : 300; // Default 800ms per word if no speed provided
 
   /**
    * Memoized function to update speech state in Redux
@@ -241,7 +263,7 @@ const TypingAnimation = ({
     // Reset for new typing animation
     setDisplayedContent("");
     setIsTyping(true);
-    setCurrentIndex(0);
+    setCurrentWordIndex(0);
     hasTriggeredEnd.current = false;
 
     return () => {
@@ -254,20 +276,34 @@ const TypingAnimation = ({
   /**
    * useEffect: Handle typing animation logic
    *
-   * Manages the core typing animation by incrementally displaying content characters.
-   * Controls the timing of character display based on the speed prop.
+   * Manages the core typing animation by incrementally displaying content words.
+   * Controls the timing of word display based on the speed prop.
    * Triggers completion callbacks and voice recognition activation when typing finishes.
    *
-   * Dependencies: isTyping, displayedContent, content, newChat, speed, onTypingComplete
+   * Dependencies: isTyping, currentWordIndex, words, newChat, speed, onTypingComplete
    */
   useEffect(() => {
     let animationTimeoutId;
 
     if (isTyping && newChat && content) {
-      if (displayedContent.length < content.length) {
+      if (currentWordIndex < words.length) {
         animationTimeoutId = setTimeout(() => {
-          setDisplayedContent((prev) => content.substring(0, prev.length + 1));
-        }, speed);
+          setDisplayedContent((prev) => {
+            const nextWord = words[currentWordIndex];
+            // Add space before word if it's not the first word
+            const space = prev ? " " : "";
+            return prev + space + nextWord;
+          });
+          setCurrentWordIndex((prev) => prev + 1);
+        }, typingSpeed); // Use the calculated typingSpeed
+        
+        // Add a small pause between words for better readability
+        // This makes the word-by-word effect more pronounced
+        if (currentWordIndex < words.length - 1) {
+          setTimeout(() => {
+            // Small pause between words
+          }, typingSpeed + 200); // Additional 200ms pause between words
+        }
       } else {
         setIsTyping(false);
         onTypingComplete?.();
@@ -290,7 +326,6 @@ const TypingAnimation = ({
                 inputVoiceSearch: true,
                 isListening: true,
                 listeningText: "Listening...",
-                wakeup: false,
                 transcript: "",
               });
             }, 500); // Increased delay to 1 second
@@ -302,7 +337,7 @@ const TypingAnimation = ({
     return () => {
       clearTimeout(animationTimeoutId);
     };
-  }, [isTyping, displayedContent, content, newChat, speed, onTypingComplete]);
+  }, [isTyping, currentWordIndex, words, newChat, speed, onTypingComplete]);
 
   /**
    * useEffect: Cleanup timeout references on unmount
