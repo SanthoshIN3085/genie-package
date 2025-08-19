@@ -53,7 +53,7 @@ export default function WakeupComponent({
 }) {
   const dispatch = useDispatch();
   const { speech, ui, search } = useSelector((state) => state.genie);
-  const { wakeup, inputVoiceSearch, isAudioMode } = speech || {};
+  const { wakeup, inputVoiceSearch, isVoiceMode } = speech || {};
   const { searchInput } = search || {};
   const {
     transcript,
@@ -654,7 +654,7 @@ export default function WakeupComponent({
       audioToPlay(genieIcons?.okAudio);
       updateSpeechState({
         wakeup: false,
-        isAudioMode: false, // Reset audio mode
+        isVoiceMode: false, // Reset audio mode
       });
       updateUIState({
         showAlert: false,
@@ -689,7 +689,7 @@ export default function WakeupComponent({
         setTimeout(() => {
           updateSpeechState({
             wakeup: false,
-            isAudioMode: !isAudioMode, //Toggle Audio Mode
+            isVoiceMode: !isVoiceMode, //Toggle Audio Mode
           });
           updateUIState({
             showAlert: false,
@@ -872,7 +872,7 @@ export default function WakeupComponent({
 
       // Re-enable audio mode for future voice interactions
       updateSpeechState({
-        isAudioMode: true,
+        isVoiceMode: true,
       });
 
       // Submit the edited transcript using the prop function
@@ -945,7 +945,7 @@ export default function WakeupComponent({
       // Stop listening and disable audio mode to let user type freely
       stopRecognition();
       updateSpeechState({
-        isAudioMode: false,
+        isVoiceMode: false,
       });
 
       console.log(

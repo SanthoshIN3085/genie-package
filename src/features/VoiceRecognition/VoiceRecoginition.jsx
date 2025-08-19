@@ -31,7 +31,7 @@ const VoiceRecognition = ({
   onSyncTranscript = () => {},
 }) => {
   const { speech, search } = useSelector((state) => state.genie);
-  const { isListening, inputVoiceSearch, isAudioMode } = speech || {};
+  const { isListening, inputVoiceSearch, isVoiceMode } = speech || {};
   const { searchInput } = search || {};
   const dispatch = useDispatch();
   const { control, setValue } = useFormContext();
@@ -159,7 +159,7 @@ const VoiceRecognition = ({
    */
   const startListening = () => {
     // Don't start listening if audio mode is disabled
-    if (!isAudioMode) {
+    if (!isVoiceMode) {
       // console.log("Audio mode is disabled, skipping voice recognition");
       return;
     }
@@ -419,7 +419,7 @@ const VoiceRecognition = ({
    */
   useEffect(() => {
     // Don't start listening if audio mode is disabled
-    if (!isAudioMode) {
+    if (!isVoiceMode) {
       return;
     }
 
@@ -439,7 +439,18 @@ const VoiceRecognition = ({
         startListening();
       }, 500);
     }
-  }, [inputVoiceSearch, isListening, listening, isUserTyping, isAudioMode]);
+  }, [inputVoiceSearch, isListening, listening, isUserTyping, isVoiceMode]);
+
+  /**
+   * Stop listening when voice mode is disabled
+   * This ensures proper coordination with Wakeup component
+   */
+  useEffect(() => {
+    if (!isVoiceMode && listening) {
+      // console.log("VoiceRecognition: Voice mode disabled, stopping listening");
+      stopListening();
+    }
+  }, [isVoiceMode, listening]);
 
   /**
    * Detect when user starts typing to pause voice recognition

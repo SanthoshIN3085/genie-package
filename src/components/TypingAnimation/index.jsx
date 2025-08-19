@@ -42,7 +42,7 @@ const TypingAnimation = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const timeoutRef = useRef(null);
   const { chat, speech } = useSelector((state) => state.genie);
-  const { isAudioMode } = speech;
+  const { isVoiceMode } = speech;
   const dispatch = useDispatch();
   const hasTriggeredEnd = useRef(false);
   const listenAudioInstance = useRef(null);
@@ -186,7 +186,7 @@ const TypingAnimation = ({
         if (!hasTriggeredEnd.current) {
           hasTriggeredEnd.current = true;
           // Only trigger voice search if NOT at the last index AND audio mode is enabled
-          if (!isLastIndex() && isAudioMode) {
+          if (!isLastIndex() && isVoiceMode) {
             setTimeout(() => {
               // Play listen indicator audio using Howler.js
               playAudio(genieIcons?.listenIndicator);
@@ -217,7 +217,7 @@ const TypingAnimation = ({
       if (!hasTriggeredEnd.current) {
         hasTriggeredEnd.current = true;
         // Only trigger voice search if NOT at the last index AND audio mode is enabled
-        if (!isLastIndex() && isAudioMode) {
+        if (!isLastIndex() && isVoiceMode) {
           setTimeout(() => {
             // Play listen indicator audio using Howler.js
             playAudio(genieIcons?.listenIndicator);
@@ -278,7 +278,7 @@ const TypingAnimation = ({
           hasTriggeredEnd.current = true;
 
           // Only trigger voice search if NOT at the last index AND audio mode is enabled
-          if (!isLastIndex() && isAudioMode) {
+          if (!isLastIndex() && isVoiceMode) {
             setTimeout(() => {
               // Play listen indicator audio using Howler.js
               playAudio(genieIcons?.listenIndicator);
