@@ -396,6 +396,43 @@ function Genie() {
   }, [searchInput, handleFormSubmitUtil, dispatch, setValue, setFocus, selectedMessages, messages, generateCard, newChat, analyticsListCard, aiAudience, aiCommunication, updateSearchState]);
 
   /**
+   * Handle manual submission from Wakeup component
+   * 
+   * This function handles manual submissions when users edit analysis transcripts
+   * and want to submit them manually instead of waiting for auto-submission.
+   * 
+   * @param {string} finalText - The manually edited text to submit
+   * 
+   * Side Effects:
+   * - May trigger form submission processing
+   * - Updates Redux search state
+   * - May update chat and other application states
+   */
+  const handleManualSubmission = useCallback((finalText) => {
+    if (finalText) {
+      handleFormSubmitUtil({
+        inputValue: finalText,
+        dispatch,
+        setValue,
+        setFocus,
+        selectedMessages,
+        messages,
+        generateCard,
+        newChat,
+        chatRef: null, // No chatRef in this context
+        analyticsListCard,
+        aiAudience,
+        aiCommunication,
+      });
+      
+      // Clear the search input after processing to prevent repeated submission
+      updateSearchState({
+        searchInput: "",
+      });
+    }
+  }, [handleFormSubmitUtil, dispatch, setValue, setFocus, selectedMessages, messages, generateCard, newChat, analyticsListCard, aiAudience, aiCommunication, updateSearchState]);
+
+  /**
    * Resume voice listening after user submits edited transcript
    * 
    * This function manages the transition from manual editing back to
@@ -519,6 +556,11 @@ function Genie() {
           handleGenieClose={handleGenieClose}
           handleNewChat={handleNewChat}
           handleVoiceSearch={handleVoiceSearch}
+          onFormSubmit={(finalText) => {
+            onFormSubmit(finalText);
+            // Always clear the input field after submission
+          }}
+          handleManualSubmission={handleManualSubmission}
           showHome={showHome}
         />
       )}
