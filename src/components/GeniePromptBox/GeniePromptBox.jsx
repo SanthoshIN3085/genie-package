@@ -54,11 +54,11 @@ const MAX_FILES = 3;
  * @param {Function} props.handleFormSubmit - Function to handle form submission with input text
  * @returns {JSX.Element} The GeniePromptBox interface
  */
-function GeniePromptBox({
+const GeniePromptBox = ({
   help = false,
   handleSideNavClick = () => {},
   handleFormSubmit = () => {},
-}) {
+}) => {
   const methods = useFormContext();
   const {
     control,
@@ -97,7 +97,7 @@ function GeniePromptBox({
    * - Sets up timeout-based text changes
    * - Cleans up timeouts on unmount or state change
    */
-  React.useEffect(() => {
+  useEffect(() => {
     if (isListening) {
       const speakTimeout = setTimeout(() => {
         dispatch(
@@ -683,6 +683,6 @@ function GeniePromptBox({
       </div>
     </div>
   );
-}
+};
 
 export default GeniePromptBox;

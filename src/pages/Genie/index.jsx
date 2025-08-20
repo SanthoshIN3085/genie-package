@@ -60,7 +60,7 @@ const NAV_ITEMS = {
  * 
  * @returns {JSX.Element} The main Genie application interface
  */
-function Genie() {
+const Genie = () => {
   const { ui, settings, search, speech, chat } = useSelector((state) => state.genie);
   const { showHome } = ui;
   const { helpTabs, settingsTab } = settings;

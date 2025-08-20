@@ -32,7 +32,7 @@ import {
   resetGenie,
 } from "Reducers/genie/reducer";
 
-function Search({ setActivesubmenu = () => {}, setGeniePages = () => {} }) {
+const Search = ({ setActivesubmenu = () => {}, setGeniePages = () => {} }) => {
   const { control, setValue, watch, getValues } = useFormContext();
   const [showFilter, setShowFilter] = React.useState(false);
   const [searchField, setSearchField] = React.useState("Title");
@@ -290,6 +290,6 @@ function Search({ setActivesubmenu = () => {}, setGeniePages = () => {} }) {
       </AnimatePresence>
     </div>
   );
-}
+};
 
 export default Search;

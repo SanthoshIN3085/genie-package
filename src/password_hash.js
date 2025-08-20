@@ -199,7 +199,7 @@ const ITERATIONS = 600000; // PBKDF2 iterations
 const OUTPUT_DIR = path.join(__dirname, "encrypted_data");
 
 // Main encryption function
-async function encryptDatasets() {
+const encryptDatasets = async () => {
   try {
     // Create output directory if it doesn't exist
     if (!fs.existsSync(OUTPUT_DIR)) {
@@ -270,8 +270,7 @@ async function encryptDatasets() {
   } catch (error) {
     console.error("Encryption failed:", error);
   }
-}
-
+};
 
 
 // Run the encryption

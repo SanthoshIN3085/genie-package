@@ -4,7 +4,7 @@ import { updateSettings } from "Reducers/genie/reducer";
 import PropTypes from "prop-types";
 import * as genieIcons from "../../assets/genieIcons";
 
-function Sidebar({ handleSideNavClick = () => {} }) {
+const Sidebar = ({ handleSideNavClick = () => {} }) => {
   const dispatch = useDispatch();
   const { settings } = useSelector((state) => state.genie);
   const { activeSectionSettings, helpTabs } = settings;
@@ -145,7 +145,7 @@ function Sidebar({ handleSideNavClick = () => {} }) {
       </div>
     </div>
   );
-}
+};
 
 Sidebar.propTypes = {
   handleNewChat: PropTypes.func,

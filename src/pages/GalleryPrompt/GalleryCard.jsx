@@ -16,12 +16,13 @@ import {
   updateSettings,
   resetGenie,
 } from "Reducers/genie/reducer";
-function GalleryCard({
+
+const GalleryCard = ({
   cardData = [],
   handlePromptClick = () => {},
   selectedTab = "",
   onBookmarkUpdate = () => {},
-}) {
+}) => {
   const { ui } = useSelector((state) => state.genie);
   const { isDarkMode } = ui;
   // Filter cards based on selected tab
@@ -412,6 +413,6 @@ function GalleryCard({
       </div>
     </div>
   );
-}
+};
 
 export default GalleryCard;

@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { updateSettings, updateUI } from "Reducers/genie/reducer";
 
-function Footer() {
+const Footer = () => {
   const dispatch = useDispatch();
   return (
     <div className="genie__footer">
@@ -28,6 +28,6 @@ function Footer() {
       </span>
     </div>
   );
-}
+};
 
 export default Footer;

@@ -97,14 +97,14 @@ export const getUserDateTimeFormat = (date = new Date(), type = "date") => {
   } else return "";
 };
 
-export function formatBytes(bytes, decimals = 2) {
+export const formatBytes = (bytes, decimals = 2) => {
   if (!+bytes) return "0 Bytes";
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
   const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-}
+};
 
 export const chartFormatNumber = (value) => {
   if (value >= 1e6) {
@@ -121,11 +121,11 @@ export const chartFormatNumber = (value) => {
   return value.toString();
 };
 
-export function _isObject(objValue) {
+export const _isObject = (objValue) => {
   return (
     objValue && typeof objValue === "object" && objValue.constructor === Object
   );
-}
+};
 
 export const formatNumber = (n) => {
   if (n >= 1000000000000) {

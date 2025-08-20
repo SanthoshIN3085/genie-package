@@ -42,7 +42,7 @@ import { lowerCase } from "lodash";
  * @param {boolean} props.showHome - Whether home page is currently shown
  * @returns {JSX.Element} Empty fragment (invisible component)
  */
-export default function WakeupComponent({
+const WakeupComponent = ({
   setShowHome = () => {},
   handleGenieClose = () => {},
   handleNewChat = () => {},
@@ -50,7 +50,7 @@ export default function WakeupComponent({
   onFormSubmit = () => {},
   handleManualSubmission = () => {},
   showHome = false,
-}) {
+}) =>{
   const dispatch = useDispatch();
   const { speech, ui, search } = useSelector((state) => state.genie);
   const { wakeup, inputVoiceSearch, isVoiceMode } = speech || {};
@@ -956,3 +956,5 @@ export default function WakeupComponent({
 
   return <></>;
 }
+
+export default WakeupComponent;

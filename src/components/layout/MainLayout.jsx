@@ -4,13 +4,13 @@ import Footer from "../common/Footer/Footer";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 
-function MainLayout({
+const MainLayout = ({
   sidebar,
   content,
   showHeader = true,
   showFooter = true,
   istextLogo = false,
-}) {
+}) => {
   const { ui, settings } = useSelector((state) => state.genie);
   const { collapsed, home } = ui;
   const { helpTabs, settingsTab } = settings;
@@ -34,7 +34,7 @@ function MainLayout({
       {showFooter && <Footer />}
     </div>
   );
-}
+};
 
 MainLayout.propTypes = {
   sidebar: PropTypes.node,

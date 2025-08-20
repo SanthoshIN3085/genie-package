@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect, useMemo} from "react";
 import { Controller } from "react-hook-form";
 import get from "lodash/get";
 import PropTypes from "prop-types";
@@ -45,12 +45,12 @@ const RSInput = ({
   isConfirmPassword = false,
   ...rest
 }) => {
-  const [typevalue, setTypevalue] = React.useState(type);
-  const [password, setPassword] = React.useState("");
-  const [showElement, setShowElement] = React.useState(true);
+  const [typevalue, setTypevalue] = useState(type);
+  const [password, setPassword] = useState("");
+  const [showElement, setShowElement] = useState(true);
   const dispatch = useDispatch();
   const icons = "";
-  React.useEffect(() => {
+  useEffect(() => {
     if (isValidIcon) {
       setShowElement(true);
       setTimeout(function () {
@@ -59,7 +59,7 @@ const RSInput = ({
     }
   }, [isValidIcon]);
 
-  const passwordTracker = React.useMemo(
+  const passwordTracker = useMemo(
     () => ({
       uppercase: password.match(regex.ATLEAST_ONE_UPPERCASE),
       lowercase: password.match(regex.ATLEAST_OE_LOWERCASE),
@@ -69,12 +69,12 @@ const RSInput = ({
     }),
     [password]
   );
-  const passwordStrength = React.useMemo(
+  const passwordStrength = useMemo(
     () => Object.values(passwordTracker).filter((value) => value).length,
     [password]
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     setTypevalue(type);
   }, [type]);
 

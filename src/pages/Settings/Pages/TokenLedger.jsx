@@ -10,7 +10,7 @@ import GenieTokenAllocated from "../../../assets/images/genie/gen-setting-token-
 import GenieResetDate from "../../../assets/images/genie/gen-setting-reset-date.svg";
 import SettingsLayout from "../SettingsLayout";
 
-function TokenLedger() {
+const TokenLedger = () => {
   const { control, setValue, watch, getValues } = useFormContext();
   const [selectedUser, setSelectedUser] = useState("");
   const [selectedModule, setSelectedModule] = useState("");
@@ -686,6 +686,6 @@ function TokenLedger() {
       <SettingsLayout pageData={pageData} renderContent={renderContent} />
     </div>
   );
-}
+};
 
 export default TokenLedger;

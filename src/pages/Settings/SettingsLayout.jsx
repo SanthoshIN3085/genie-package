@@ -106,7 +106,7 @@ const SectionCard = ({
   );
 };
 
-function SettingsLayout({ pageData, renderContent }) {
+const SettingsLayout = ({ pageData, renderContent }) => {
   const isHeader = pageData?.isHeader;
 
   // Get all main section properties dynamically
@@ -194,6 +194,6 @@ function SettingsLayout({ pageData, renderContent }) {
       </div>
     </>
   );
-}
+};
 
 export default SettingsLayout;
