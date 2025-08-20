@@ -25,13 +25,13 @@ import { Howl } from "howler";
  * - Natural rhythm: Creates engaging, readable typing animation
  *
  * @param {Object} props - Component props
- * @param {string} props.content - The text content to be displayed with typing animation
- * @param {number} props.speed - The base speed of typing animation in milliseconds per word (adds 500ms delay for visibility)
+ * @param {string} props.content - Text content to display with typing animation
+ * @param {number} props.speed - Base speed of typing animation in milliseconds per word
  * @param {boolean} props.skipTyping - Whether to skip typing animation and show content immediately
- * @param {Function} props.onTypingComplete - Callback function called when typing animation completes
+ * @param {Function} props.onTypingComplete - Callback when typing animation completes
  * @param {string} props.className - Additional CSS class names for styling
  * @param {Function|React.ReactNode} props.children - Render prop function or React children
- * @param {React.RefObject} props.chatRef - Reference to the chat container for scrolling
+ * @param {React.RefObject} props.chatRef - Reference to chat container for scrolling
  * @returns {JSX.Element|null} The typing animation component or null if no content
  */
 const TypingAnimation = ({
@@ -54,24 +54,13 @@ const TypingAnimation = ({
   const listenAudioInstance = useRef(null);
 
   // Split content into words for word-by-word typing
-  // Uses regex /\s+/ to handle multiple types of whitespace (spaces, tabs, newlines)
   const words = content ? content.split(/\s+/) : [];
   
   // Calculate typing speed with additional delay for better visibility
-  // Base speed + extra delay to make word-by-word effect more noticeable
-  // Default: 800ms per word, or speed + 500ms if custom speed provided
-  // This slower pace makes the word-by-word animation much more visible and engaging
-  // 
-  // Timing Strategy:
-  // - Base delay: 500ms minimum for word visibility
-  // - Custom speed: Added to base delay for fine-tuning
-  // - Word pause: Additional 200ms between words for readability
-  // - Total effect: Creates a natural, readable typing rhythm
   const typingSpeed = speed ? speed + 200 : 300; // Default 800ms per word if no speed provided
 
   /**
    * Memoized function to update speech state in Redux
-   *
    * @param {Object} data - Speech state data to update
    */
   const updateSpeechState = useCallback(
@@ -81,7 +70,6 @@ const TypingAnimation = ({
 
   /**
    * Memoized function to update UI state in Redux
-   *
    * @param {Object} data - UI state data to update
    */
   const updateUIState = useCallback(
@@ -89,15 +77,7 @@ const TypingAnimation = ({
     [dispatch]
   );
 
-  /**
-   * useEffect: Initialize Howler audio instance for listen indicator
-   *
-   * Creates and preloads the listen indicator audio using Howler.js.
-   * Sets up event handlers for audio loading, playing, and error handling.
-   * Provides cleanup function to stop and nullify audio instance on unmount.
-   *
-   * Dependencies: None (runs only once on mount)
-   */
+  // Initialize Howler audio instance for listen indicator
   useEffect(() => {
     if (genieIcons?.listenIndicator) {
       listenAudioInstance.current = new Howl({
@@ -113,7 +93,6 @@ const TypingAnimation = ({
       });
     }
 
-    // Cleanup function
     return () => {
       if (listenAudioInstance.current) {
         listenAudioInstance.current.stop();
@@ -123,12 +102,7 @@ const TypingAnimation = ({
   }, []);
 
   /**
-   * playAudio: Play audio files using Howler.js
-   *
-   * Handles audio playback for different audio files. Uses preloaded Howler instance
-   * for listen indicator audio and creates new instances for other audio files.
-   * Includes error handling for audio playback failures.
-   *
+   * Play audio files using Howler.js
    * @param {string} audioFile - Path to the audio file to play
    * @returns {Promise<void>} Promise that resolves when audio starts playing
    */
@@ -138,10 +112,8 @@ const TypingAnimation = ({
         audioFile === genieIcons?.listenIndicator &&
         listenAudioInstance.current
       ) {
-        // Use the preloaded Howler instance for listen indicator
         listenAudioInstance.current.play();
       } else {
-        // Fallback to creating a new Howl instance for other audio files
         const howlInstance = new Howl({
           src: [audioFile],
           html5: true,
@@ -157,10 +129,7 @@ const TypingAnimation = ({
   const { newChat, message, selectedMessages } = chat;
 
   /**
-   * scrollToBottom: Smoothly scroll chat container to bottom
-   *
-   * Uses smooth scrolling behavior to scroll the chat container to its bottom.
-   * Only executes if chatRef is provided and valid.
+   * Smoothly scroll chat container to bottom
    */
   const scrollToBottom = () => {
     if (chatRef?.current) {
@@ -172,11 +141,7 @@ const TypingAnimation = ({
   };
 
   /**
-   * isLastIndex: Check if current message is at the last index
-   *
-   * Determines if the current message is at the last position in the selected messages array.
-   * Uses modulo operation to handle circular indexing with 4 positions.
-   *
+   * Check if current message is at the last index
    * @returns {boolean} True if at last index, false otherwise
    */
   const isLastIndex = () => {
@@ -185,32 +150,19 @@ const TypingAnimation = ({
     return currentIndex === 3;
   };
 
-  /**
-   * useEffect: Handle content changes and typing initialization
-   *
-   * Manages the initial state when content changes. Handles cases for:
-   * - No new chat or content (immediate display)
-   * - Skip typing mode (immediate display with voice activation)
-   * - New typing animation (reset state and start animation)
-   *
-   * Triggers voice recognition activation after content display (unless at last index).
-   *
-   * Dependencies: content, speed, skipTyping, onTypingComplete, newChat
-   */
+  // Handle content changes and typing initialization
   useEffect(() => {
     if (!newChat || !content) {
       setDisplayedContent(content || "");
       setIsTyping(false);
       if (content || !newChat) {
         onTypingComplete?.();
-        // Scroll to bottom when content is displayed
         scrollToBottom();
         if (!hasTriggeredEnd.current) {
           hasTriggeredEnd.current = true;
           // Only trigger voice search if NOT at the last index AND audio mode is enabled
           if (!isLastIndex() && isVoiceMode) {
             setTimeout(() => {
-              // Play listen indicator audio using Howler.js
               playAudio(genieIcons?.listenIndicator);
 
               updateUIState({
@@ -223,7 +175,7 @@ const TypingAnimation = ({
                 wakeup: false,
                 transcript: "",
               });
-            }, 1000); // Increased delay to 1 second
+            }, 1000);
           }
         }
       }
@@ -238,7 +190,6 @@ const TypingAnimation = ({
       scrollToBottom();
       if (!hasTriggeredEnd.current) {
         hasTriggeredEnd.current = true;
-        // Only trigger voice search if NOT at the last index AND audio mode is enabled
         if (!isLastIndex() && isVoiceMode) {
           setTimeout(() => {
             // Play listen indicator audio using Howler.js
@@ -254,7 +205,7 @@ const TypingAnimation = ({
               wakeup: false,
               transcript: "",
             });
-          }, 500); // Increased delay to 1 second
+          }, 500);
         }
       }
       return;
@@ -273,15 +224,7 @@ const TypingAnimation = ({
     };
   }, [content, speed, skipTyping, onTypingComplete, newChat]);
 
-  /**
-   * useEffect: Handle typing animation logic
-   *
-   * Manages the core typing animation by incrementally displaying content words.
-   * Controls the timing of word display based on the speed prop.
-   * Triggers completion callbacks and voice recognition activation when typing finishes.
-   *
-   * Dependencies: isTyping, currentWordIndex, words, newChat, speed, onTypingComplete
-   */
+  // Handle typing animation logic
   useEffect(() => {
     let animationTimeoutId;
 
@@ -295,19 +238,18 @@ const TypingAnimation = ({
             return prev + space + nextWord;
           });
           setCurrentWordIndex((prev) => prev + 1);
-        }, typingSpeed); // Use the calculated typingSpeed
+        }, typingSpeed);
         
         // Add a small pause between words for better readability
         // This makes the word-by-word effect more pronounced
         if (currentWordIndex < words.length - 1) {
           setTimeout(() => {
             // Small pause between words
-          }, typingSpeed + 200); // Additional 200ms pause between words
+          }, typingSpeed + 200);
         }
       } else {
         setIsTyping(false);
         onTypingComplete?.();
-        // Scroll to bottom when typing animation completes
         scrollToBottom();
 
         if (!hasTriggeredEnd.current) {
@@ -316,7 +258,6 @@ const TypingAnimation = ({
           // Only trigger voice search if NOT at the last index AND audio mode is enabled
           if (!isLastIndex() && isVoiceMode) {
             setTimeout(() => {
-              // Play listen indicator audio using Howler.js
               playAudio(genieIcons?.listenIndicator);
 
               updateUIState({
@@ -328,7 +269,7 @@ const TypingAnimation = ({
                 listeningText: "Listening...",
                 transcript: "",
               });
-            }, 500); // Increased delay to 1 second
+            }, 500);
           }
         }
       }
@@ -339,14 +280,7 @@ const TypingAnimation = ({
     };
   }, [isTyping, currentWordIndex, words, newChat, speed, onTypingComplete]);
 
-  /**
-   * useEffect: Cleanup timeout references on unmount
-   *
-   * Ensures that any pending timeout references are cleared when the component unmounts
-   * to prevent memory leaks and potential errors.
-   *
-   * Dependencies: None (runs only once on unmount)
-   */
+  // Cleanup timeout references on unmount
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {

@@ -5,7 +5,7 @@ import * as genieIcons from "../../../assets/genieIcons";
 import RSAlert from "Components/RSAlert";
 import { updateUI, updateSettings } from "Reducers/genie/reducer";
 
-function TermsAndCondition() {
+const TermsAndCondition = () => {
   const { ui, settings } = useSelector((state) => state.genie);
   const { isTermsAndConditions } = settings;
   const { showAlert } = ui;
@@ -89,6 +89,6 @@ function TermsAndCondition() {
       />
     </div>
   );
-}
+};
 
 export default TermsAndCondition;

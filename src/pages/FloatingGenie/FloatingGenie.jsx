@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateUI } from "Reducers/genie/reducer";
 import * as genieIcons from "../../assets/genieIcons";
 
-function FloatingGenie() {
+const FloatingGenie = () => {
   const dispatch = useDispatch();
   const { ui } = useSelector((state) => state.genie);
   const { showHome, howerStarIcon } = ui;
@@ -63,6 +63,6 @@ function FloatingGenie() {
       </div>
     </div>
   );
-}
+};
 
 export default FloatingGenie;

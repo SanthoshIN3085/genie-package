@@ -90,7 +90,7 @@ const renderContent = (content) => {
   }
 };
 
-function Billings() {
+const Billings = () => {
   const AuditData = [
     {
       id: 1,
@@ -594,6 +594,6 @@ function Billings() {
       <SettingsLayout pageData={pageData} renderContent={renderContent} />
     </div>
   );
-}
+};
 
 export default Billings;

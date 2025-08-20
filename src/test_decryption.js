@@ -13,7 +13,7 @@ const ITERATIONS = 600000; // PBKDF2 iterations
 const OUTPUT_DIR = path.join(__dirname, "encrypted_data");
 
 // Decryption function
-async function decryptDataset(datasetName) {
+const decryptDataset = async (datasetName) => {
   try {
     const datasetDir = path.join(OUTPUT_DIR, datasetName);
     const encryptedFilePath = path.join(datasetDir, "encrypted.json");
@@ -69,10 +69,10 @@ async function decryptDataset(datasetName) {
     console.error(`Decryption failed for ${datasetName}:`, error.message);
     throw error;
   }
-}
+};
 
 // Function to decrypt all datasets
-async function decryptAllDatasets() {
+const decryptAllDatasets = async () => {
   try {
     const decryptedData = {};
     const datasetNames = ["faqs", "limitations", "capabilities"];
@@ -89,13 +89,13 @@ async function decryptAllDatasets() {
     console.error("Decryption failed:", error);
     throw error;
   }
-}
+};
 
 // Export functions for use in other modules
 export { decryptDataset, decryptAllDatasets };
 
 // Example usage functions
-async function decryptSingleDataset() {
+const decryptSingleDataset = async () => {
   try {
     console.log("Decrypting FAQs dataset...\n");
     const faqsData = await decryptDataset("faqs");
@@ -103,9 +103,9 @@ async function decryptSingleDataset() {
   } catch (error) {
     console.error("Failed to decrypt FAQs:", error);
   }
-}
+};
 
-async function decryptAllAndShowSummary() {
+const decryptAllAndShowSummary = async () => {
   try {
     console.log("Decrypting all datasets...\n");
     const allData = await decryptAllDatasets();
@@ -120,7 +120,7 @@ async function decryptAllAndShowSummary() {
   } catch (error) {
     console.error("❌ Failed to decrypt all datasets:", error);
   }
-}
+};
 
 // Run decryption if this file is executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {

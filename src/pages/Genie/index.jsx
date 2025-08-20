@@ -28,13 +28,7 @@ import RSTooltip from "Components/RSTooltip";
 import * as genieIcons from "../../assets/genieIcons";
 import { handleFormSubmit as handleFormSubmitUtil } from "../../Utils/formHandlers";
 
-/**
- * Navigation item constants for the Genie application
- * 
- * These constants define the different navigation states and pages
- * that the application can display, providing a centralized way to
- * manage navigation logic and prevent typos in string literals.
- */
+// Navigation item constants for the Genie application
 const NAV_ITEMS = {
   NEW_PROMPT: "newprompt",
   PROMPT_GALLERY: "promptgallery",
@@ -46,21 +40,13 @@ const NAV_ITEMS = {
 
 /**
  * Genie Component - Main application container and navigation hub
- *
- * This component serves as the central orchestrator for the Genie application by:
- * 1. Managing navigation between different application sections
- * 2. Coordinating voice recognition and wakeup systems
- * 3. Handling form submissions and chat state management
- * 4. Managing UI state and modal displays
- * 5. Coordinating between different feature components
- * 6. Handling user interactions and state transitions
  * 
  * The component uses Redux for state management and react-hook-form for form handling,
  * providing a seamless user experience across different application modes.
  * 
  * @returns {JSX.Element} The main Genie application interface
  */
-function Genie() {
+const Genie = () => {
   const { ui, settings, search, speech, chat } = useSelector((state) => state.genie);
   const { showHome } = ui;
   const { helpTabs, settingsTab } = settings;
@@ -78,7 +64,6 @@ function Genie() {
 
   /**
    * Memoized function to update UI state in Redux
-   * 
    * @param {Object} data - UI state data to update
    */
   const updateUIState = useCallback(
@@ -88,7 +73,6 @@ function Genie() {
 
   /**
    * Memoized function to update chat state in Redux
-   * 
    * @param {Object} data - Chat state data to update
    */
   const updateChatState = useCallback(
@@ -98,7 +82,6 @@ function Genie() {
 
   /**
    * Memoized function to update search state in Redux
-   * 
    * @param {Object} data - Search state data to update
    */
   const updateSearchState = useCallback(
@@ -108,7 +91,6 @@ function Genie() {
 
   /**
    * Memoized function to update settings state in Redux
-   * 
    * @param {Object} data - Settings state data to update
    */
   const updateSettingsState = useCallback(
@@ -118,7 +100,6 @@ function Genie() {
 
   /**
    * Memoized function to update speech state in Redux
-   * 
    * @param {Object} data - Speech state data to update
    */
   const updateSpeechState = useCallback(
@@ -128,7 +109,6 @@ function Genie() {
 
   /**
    * Memoized function to update prompt gallery flag in Redux
-   * 
    * @param {boolean} flag - Prompt gallery flag value
    */
   const updatePromptGalleryFlagState = useCallback(
@@ -138,14 +118,6 @@ function Genie() {
 
   /**
    * Reset the chat state to initial values
-   * 
-   * This function clears all chat-related state including messages,
-   * selected messages, and chat history. It's used when starting
-   * new conversations or resetting the application state.
-   * 
-   * Side Effects:
-   * - Dispatches resetChat action to Redux
-   * - Clears all chat messages and state
    */
   const resetChatState = useCallback(() => {
     dispatch(resetChat());
@@ -153,17 +125,8 @@ function Genie() {
 
   /**
    * Update UI state with navigation item and optional workings display
-   * 
-   * This function manages the main navigation state by updating the active
-   * navigation item and optionally showing the workings section. It's used
-   * throughout the navigation system to maintain consistent state updates.
-   * 
    * @param {string} activeItem - The navigation item to activate
    * @param {boolean} showWorkings - Whether to show the workings section
-   * 
-   * Side Effects:
-   * - Updates Redux UI state with new navigation item
-   * - May toggle workings section visibility
    */
   const updateUIStateWithNav = useCallback((activeItem, showWorkings = false) => {
     updateUIState({
@@ -174,15 +137,6 @@ function Genie() {
 
   /**
    * Reset search input and settings to default state
-   * 
-   * This function clears the search input and resets both help and settings
-   * tabs to their closed state. It's used during navigation to ensure
-   * clean state transitions between different application sections.
-   * 
-   * Side Effects:
-   * - Updates Redux search state to clear input
-   * - Updates Redux settings state to close tabs
-   * - Clears form input value
    */
   const resetSearchAndSettings = useCallback(() => {
     updateSearchState({ searchInput: "" });
@@ -195,16 +149,6 @@ function Genie() {
 
   /**
    * Navigation handlers for different application sections
-   * 
-   * This object contains functions for handling navigation to different
-   * parts of the application. Each handler manages the specific state
-   * transitions and cleanup required for its respective section.
-   * 
-   * The handlers ensure proper state management by:
-   * - Resetting chat state when appropriate
-   * - Updating UI state for navigation
-   * - Managing prompt gallery flags
-   * - Handling settings and help tab states
    */
   const navigationHandlers = useCallback({
     [NAV_ITEMS.NEW_PROMPT]: () => {
@@ -239,22 +183,7 @@ function Genie() {
 
   /**
    * Handle side navigation clicks and route to appropriate handlers
-   * 
-   * This function processes navigation clicks by looking up the appropriate
-   * handler function and executing it. It includes fallback logic for unknown
-   * navigation items and provides graceful error handling.
-   * 
-   * Special handling is provided for:
-   * - Known navigation items (routes to specific handlers)
-   * - "token-usage" (routes to settings dashboard)
-   * - Unknown items (falls back to new prompt)
-   * 
    * @param {string} activePage - The navigation page identifier
-   * 
-   * Side Effects:
-   * - May execute navigation handler functions
-   * - May update Redux state for navigation
-   * - May trigger fallback navigation actions
    */
   const handleSideNavClick = useCallback((activePage) => {
     const handler = navigationHandlers[activePage];
@@ -264,7 +193,6 @@ function Genie() {
     }
     // Gracefully handle unknown nav ids (e.g., 'token-usage')
     if (activePage === "token-usage") {
-      // Route to settings dashboard as a sensible default action
       updateSettingsState({
         settingsTab: true,
         activeSectionSettings: "dashboard",
@@ -278,21 +206,6 @@ function Genie() {
 
   /**
    * Start a new chat session and reset application state
-   * 
-   * This function initializes a fresh chat session by:
-   * 1. Clearing the search input
-   * 2. Resetting chat state (messages, selections)
-   * 3. Setting the active navigation item to new prompt
-   * 4. Closing help and settings tabs
-   * 
-   * It's used when users want to start fresh conversations
-   * or when the application needs to reset its state.
-   * 
-   * Side Effects:
-   * - Updates Redux search state
-   * - Updates Redux chat state
-   * - Updates Redux UI state
-   * - Updates Redux settings state
    */
   const handleNewChat = useCallback(() => {
     updateSearchState({
@@ -314,20 +227,7 @@ function Genie() {
 
   /**
    * Handle form submission from voice recognition or manual input
-   * 
-   * This function processes form submissions by:
-   * 1. Calling the utility function to handle the actual submission
-   * 2. Closing voice search mode after processing
-   * 3. Clearing search input to prevent repeated submissions
-   * 4. Managing the transition between input modes
-   * 
    * @param {string} finalText - The final text to submit (from voice or manual input)
-   * 
-   * Side Effects:
-   * - May trigger form submission processing
-   * - Updates Redux speech state
-   * - Updates Redux search state
-   * - May update chat and other application states
    */
   const onFormSubmit = useCallback((finalText) => {
     if (finalText) {
@@ -397,16 +297,7 @@ function Genie() {
 
   /**
    * Handle manual submission from Wakeup component
-   * 
-   * This function handles manual submissions when users edit analysis transcripts
-   * and want to submit them manually instead of waiting for auto-submission.
-   * 
    * @param {string} finalText - The manually edited text to submit
-   * 
-   * Side Effects:
-   * - May trigger form submission processing
-   * - Updates Redux search state
-   * - May update chat and other application states
    */
   const handleManualSubmission = useCallback((finalText) => {
     if (finalText) {
@@ -474,9 +365,6 @@ function Genie() {
    * corrected version instead of the original voice input.
    * 
    * @param {string} editedTranscript - The manually edited transcript text
-   * 
-   * Side Effects:
-   * - Updates Redux search state with edited transcript
    */
   const handleSyncTranscript = useCallback((editedTranscript) => {
     // Update the search input with the edited transcript
@@ -521,17 +409,6 @@ function Genie() {
 
   /**
    * Confirm application close and reset all state
-   * 
-   * This function completes the application close process by:
-   * 1. Hiding the confirmation modal
-   * 2. Resetting all Genie application state
-   * 3. Returning to initial application state
-   * 
-   * It's called after user confirms they want to close the application.
-   * 
-   * Side Effects:
-   * - Hides confirmation modal
-   * - Resets all Redux state to initial values
    */
   const handleGenieClose = useCallback(() => {
     setShowModal(false);

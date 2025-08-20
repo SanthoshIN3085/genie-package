@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SideNav from "../SideNav/SideNav";
 import MainLayout from "Components/layout/MainLayout";
@@ -43,7 +43,7 @@ const CONTENT_MAP = {
   default: Welcome,
 };
 
-function Home({ handleSideNavClick }) {
+const Home = ({ handleSideNavClick }) => {
   const { setValue, setFocus, getValues } = useFormContext();
   const dispatch = useDispatch();
   const { ui, chat, settings, search, speech } = useSelector(
@@ -121,7 +121,7 @@ function Home({ handleSideNavClick }) {
     });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!searchInput || messages?.length > 0 || selectedMessages?.length > 0)
       return;
 
@@ -312,6 +312,6 @@ function Home({ handleSideNavClick }) {
       </div>
     </>
   );
-}
+};
 
 export default Home;

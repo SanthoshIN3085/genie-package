@@ -10,7 +10,7 @@ import {
   menuIconDownarrow,
 } from "../../../assets/genieIcons";
 
-function Sidebar({ handleNewChat }) {
+const Sidebar = ({ handleNewChat }) => {
   const dispatch = useDispatch();
   const { settings } = useSelector((state) => state.genie);
   const { activeSectionSettings, helpTabs } = settings;
@@ -158,7 +158,7 @@ function Sidebar({ handleNewChat }) {
       </div>
     </div>
   );
-}
+};
 
 Sidebar.propTypes = {
   handleNewChat: PropTypes.func,
