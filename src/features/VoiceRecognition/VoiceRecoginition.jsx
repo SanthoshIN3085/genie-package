@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+// 1. IMPORTS AT THE TOP
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -8,6 +15,51 @@ import { useDispatch, useSelector } from "react-redux";
 import { transformGenieWords } from "../utils/util.js";
 import { filterProfanity, containsOpenKeywords } from "../command.js";
 
+// 2. PURE FUNCTIONS
+/**
+ * Clean up speech recognition session
+ * @returns {void}
+ */
+const cleanupSpeechRecognition = () => {
+  try {
+    if (
+      typeof SpeechRecognition?.getRecognition === "function" &&
+      SpeechRecognition.getRecognition()
+    ) {
+      const recognition = SpeechRecognition.getRecognition();
+      if (recognition?.abort) {
+        recognition.abort();
+      }
+    }
+  } catch (error) {
+    console.error("Error cleaning up speech recognition:", error);
+  }
+};
+
+/**
+ * Validate transcript confidence level
+ * @param {string} transcript - Speech transcript
+ * @param {number} minConfidence - Minimum confidence threshold
+ * @returns {boolean} Whether transcript meets confidence requirements
+ */
+const isTranscriptValid = (transcript, minConfidence = 0.7) => {
+  if (!transcript?.trim()) return false;
+  const confidence = transcript.confidence || 1.0;
+  return confidence >= minConfidence;
+};
+
+/**
+ * Process and clean transcript text
+ * @param {string} transcript - Raw transcript
+ * @returns {string} Processed transcript
+ */
+const processTranscript = (transcript) => {
+  if (!transcript) return "";
+  const filtered = filterProfanity(transcript);
+  return transformGenieWords(filtered);
+};
+
+// 3. FUNCTIONAL COMPONENT
 /**
  * VoiceRecognition Component - Handles voice input and transcript management
  * Manages voice recognition, transcript processing, and form coordination
@@ -23,19 +75,7 @@ const VoiceRecognition = ({
   onResumeListening = () => {},
   onSyncTranscript = () => {},
 }) => {
-  const { speech, search } = useSelector((state) => state.genie);
-  const { isListening, inputVoiceSearch, isVoiceMode } = speech || {};
-  const { searchInput } = search || {};
-  const dispatch = useDispatch();
-  const { control, setValue } = useFormContext();
-
-  const {
-    transcript,
-    listening,
-    resetTranscript,
-    browserSupportsSpeechRecognition,
-  } = useSpeechRecognition();
-
+  // 4. STATE MANAGEMENT
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasStartedSpeaking, setHasStartedSpeaking] = useState(false);
@@ -43,9 +83,20 @@ const VoiceRecognition = ({
   const [isUserTyping, setIsUserTyping] = useState(false);
   const [originalTranscript, setOriginalTranscript] = useState("");
   const [isNewSession, setIsNewSession] = useState(true);
-  const SILENCE_LIMIT_MS = 5000;
+
+  // 5. CONTEXT MANAGEMENT
+  const dispatch = useDispatch();
+  const { speech, search } = useSelector((state) => state.genie);
+  const { isListening, inputVoiceSearch, isVoiceMode } = speech || {};
+  const { searchInput } = search || {};
+  const { control, setValue } = useFormContext();
+
+  // 6. USE REFS MANAGEMENT
   const silenceTimerRef = useRef(null);
+  const SILENCE_LIMIT_MS = 5000;
   const debounceDelay = 2000;
+
+  // 7. PERFORMANCE OPTIMIZATION FUNCTIONS (useMemo, useCallback)
   const continuousListeningOptions = useMemo(
     () => ({
       continuous: true,
@@ -84,170 +135,15 @@ const VoiceRecognition = ({
     [dispatch]
   );
 
-  /**
-   * Clear the silence timer to prevent automatic stopping of listening
-   */
-  const clearSilenceTimer = () => {
-    if (silenceTimerRef.current) {
-      clearTimeout(silenceTimerRef.current);
-      silenceTimerRef.current = null;
-    }
-  };
+  // 8. CUSTOM HOOKS
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
 
-  /**
-   * Reset the silence timer to start counting down from 5 seconds
-   */
-  const resetSilenceTimer = () => {
-    clearSilenceTimer();
-    silenceTimerRef.current = setTimeout(() => {
-      if (listening) {
-        stopListening();
-      }
-    }, SILENCE_LIMIT_MS);
-  };
-
-  /**
-   * Start a new voice recognition listening session
-   */
-  const startListening = () => {
-    if (!isVoiceMode) {
-      return;
-    }
-
-    try {
-      resetTranscript();
-      if (
-        browserSupportsSpeechRecognition &&
-        typeof SpeechRecognition.getRecognition === "function"
-      ) {
-        const recognition = SpeechRecognition.getRecognition();
-        if (recognition && recognition.abort) {
-          recognition.abort();
-        }
-      }
-    } catch (error) {}
-
-    setTimeout(() => {
-      if (transcript && transcript.trim()) {
-        return;
-      }
-
-      setHasStartedSpeaking(false);
-      setValue("searchInput", "");
-      setIsInitialized(false);
-      setIsUserTyping(false);
-      setOriginalTranscript("");
-      setIsNewSession(true);
-
-      updateSearchState({
-        searchInput: "",
-      });
-
-      if (!browserSupportsSpeechRecognition) {
-        updateChatState({
-          errorTranscript:
-            "Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari.",
-        });
-        updateSpeechState({
-          isListening: false,
-          inputVoiceSearch: false,
-        });
-        return;
-      }
-      SpeechRecognition.startListening(continuousListeningOptions);
-      updateSpeechState({
-        isListening: true,
-      });
-      clearTimeout(debounceTimeout);
-
-      setTimeout(() => {
-        setIsInitialized(true);
-      }, 1000);
-
-      resetSilenceTimer();
-    }, 100);
-  };
-
-  /**
-   * Stop the current voice recognition listening session
-   */
-  const stopListening = () => {
-    if (browserSupportsSpeechRecognition) {
-      SpeechRecognition.stopListening();
-    }
-    updateSpeechState({
-      isListening: false,
-      inputVoiceSearch: false,
-    });
-    clearTimeout(debounceTimeout);
-    clearSilenceTimer();
-
-    if (transcript && transcript.trim() && !isSubmitting && !isUserTyping) {
-      const confidence = transcript.confidence || 1.0;
-      if (confidence >= 0.7) {
-        setIsSubmitting(true);
-        const filteredTranscript = filterProfanity(transcript);
-
-        const hasOpenKeyword = containsOpenKeywords(filteredTranscript);
-
-        if (hasOpenKeyword) {
-          setIsSubmitting(false);
-          return;
-        }
-
-        const correctedTranscript = transformGenieWords(filteredTranscript);
-        onFormSubmit(correctedTranscript);
-
-        setValue("searchInput", "");
-        resetTranscript();
-        setTimeout(() => {
-          setIsSubmitting(false);
-        }, 1000);
-      }
-    }
-
-    setIsNewSession(true);
-  };
-
-  /**
-   * Handle speech recognition errors from the browser API
-   * @param {Object} event - Speech recognition error event object
-   */
-  const handleSpeechRecognitionError = (event) => {
-    let errorMessage;
-    if (event.error === "not-allowed") {
-      errorMessage =
-        "Microphone access denied. Please enable it for voice interaction.";
-      updateSpeechState({
-        isListening: false,
-        inputVoiceSearch: false,
-      });
-
-      updateChatState({
-        errorTranscript: errorMessage,
-      });
-
-      if (browserSupportsSpeechRecognition) {
-        SpeechRecognition.stopListening();
-      }
-      clearTimeout(debounceTimeout);
-    } else if (event.error === "network") {
-      errorMessage = "Network error. Please check your connection.";
-      updateSpeechState({
-        isListening: false,
-        inputVoiceSearch: false,
-      });
-
-      updateChatState({
-        errorTranscript: errorMessage,
-      });
-      if (browserSupportsSpeechRecognition) {
-        SpeechRecognition.stopListening();
-      }
-      clearTimeout(debounceTimeout);
-    }
-  };
-
+  // 9. SIDE EFFECTS
   // Component initialization and setup
   useEffect(() => {
     if (browserSupportsSpeechRecognition) {
@@ -329,8 +225,7 @@ const VoiceRecognition = ({
 
       const correctedTranscript = transformGenieWords(filteredTranscript);
 
-      const confidence = transcript.confidence || 1.0;
-      if (confidence >= 0.7) {
+      if (isTranscriptValid(transcript)) {
         if (!originalTranscript) {
           setOriginalTranscript(correctedTranscript);
         }
@@ -377,6 +272,175 @@ const VoiceRecognition = ({
     };
   }, []);
 
+  // 10. COMPONENT SPECIFIC FUNCTIONS (grouped by similar functionalities)
+
+  // // AUDIO FUNCTIONS
+  /**
+   * Clear the silence timer to prevent automatic stopping of listening
+   */
+  const clearSilenceTimer = () => {
+    if (silenceTimerRef.current) {
+      clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
+    }
+  };
+
+  /**
+   * Reset the silence timer to start counting down from 5 seconds
+   */
+  const resetSilenceTimer = () => {
+    clearSilenceTimer();
+    silenceTimerRef.current = setTimeout(() => {
+      if (listening) {
+        stopListening();
+      }
+    }, SILENCE_LIMIT_MS);
+  };
+
+  // // SPEECH RECOGNITION FUNCTIONS
+  /**
+   * Start a new voice recognition listening session
+   */
+  const startListening = () => {
+    if (!isVoiceMode) {
+      return;
+    }
+
+    try {
+      resetTranscript();
+      cleanupSpeechRecognition();
+    } catch (error) {
+      console.error("Error during speech recognition cleanup:", error);
+    }
+
+    setTimeout(() => {
+      if (transcript && transcript.trim()) {
+        return;
+      }
+
+      setHasStartedSpeaking(false);
+      setValue("searchInput", "");
+      setIsInitialized(false);
+      setIsUserTyping(false);
+      setOriginalTranscript("");
+      setIsNewSession(true);
+
+      updateSearchState({
+        searchInput: "",
+      });
+
+      if (!browserSupportsSpeechRecognition) {
+        updateChatState({
+          errorTranscript:
+            "Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari.",
+        });
+        updateSpeechState({
+          isListening: false,
+          inputVoiceSearch: false,
+        });
+        return;
+      }
+
+      SpeechRecognition.startListening(continuousListeningOptions);
+      updateSpeechState({
+        isListening: true,
+      });
+      clearTimeout(debounceTimeout);
+
+      setTimeout(() => {
+        setIsInitialized(true);
+      }, 1000);
+
+      resetSilenceTimer();
+    }, 100);
+  };
+
+  /**
+   * Stop the current voice recognition listening session
+   */
+  const stopListening = () => {
+    if (browserSupportsSpeechRecognition) {
+      SpeechRecognition.stopListening();
+    }
+    updateSpeechState({
+      isListening: false,
+      inputVoiceSearch: false,
+    });
+    clearTimeout(debounceTimeout);
+    clearSilenceTimer();
+
+    if (transcript && transcript.trim() && !isSubmitting && !isUserTyping) {
+      if (isTranscriptValid(transcript)) {
+        setIsSubmitting(true);
+        const processedTranscript = processTranscript(transcript);
+
+        const hasOpenKeyword = containsOpenKeywords(processedTranscript);
+
+        if (hasOpenKeyword) {
+          setIsSubmitting(false);
+          return;
+        }
+
+        onFormSubmit(processedTranscript);
+
+        setValue("searchInput", "");
+        resetTranscript();
+        setTimeout(() => {
+          setIsSubmitting(false);
+        }, 1000);
+      }
+    }
+
+    setIsNewSession(true);
+  };
+
+  /**
+   * Handle speech recognition errors from the browser API
+   * @param {Object} event - Speech recognition error event object
+   */
+  const handleSpeechRecognitionError = (event) => {
+    let errorMessage;
+    if (event.error === "not-allowed") {
+      errorMessage =
+        "Microphone access denied. Please enable it for voice interaction.";
+      updateSpeechState({
+        isListening: false,
+        inputVoiceSearch: false,
+      });
+
+      updateChatState({
+        errorTranscript: errorMessage,
+      });
+
+      if (browserSupportsSpeechRecognition) {
+        SpeechRecognition.stopListening();
+      }
+      clearTimeout(debounceTimeout);
+    } else if (event.error === "network") {
+      errorMessage = "Network error. Please check your connection.";
+      updateSpeechState({
+        isListening: false,
+        inputVoiceSearch: false,
+      });
+
+      updateChatState({
+        errorTranscript: errorMessage,
+      });
+      if (browserSupportsSpeechRecognition) {
+        SpeechRecognition.stopListening();
+      }
+      clearTimeout(debounceTimeout);
+    }
+  };
+
+  // 11. COMPUTED VALUES
+  const canListen =
+    isVoiceMode && browserSupportsSpeechRecognition && !isSubmitting;
+
+  const shouldProcessTranscript =
+    transcript && !isNewSession && isInitialized && !isUserTyping;
+
+  // 12. RETURN UI
   return null;
 };
 
