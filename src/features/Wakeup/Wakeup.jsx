@@ -620,7 +620,7 @@ const WakeupComponent = ({
     SpeechRecognition.abortListening();
   };
 
- /**
+  /**
    * Handle manual submission when user is typing
    */
   const submitManualTranscript = () => {
@@ -647,13 +647,11 @@ const WakeupComponent = ({
     const analysis = analyzeTranscript(fullTranscript);
 
     if (analysis.hasProfanity) {
-
       setIsProcessing(false);
       return;
     }
 
     if (analysis.hasOpen) {
-
       if (!hasBeenWoken && !showHome) {
         audioToPlay(genieIcons?.whatCanDoAudio);
         setHasBeenWoken(true);

@@ -309,6 +309,7 @@ const Message = ({
                               analyticsTypingContent && (
                                 <div className="chatbox__typing-step">
                                   <TypingAnimation
+                                    key={`analytics-${analyticsTypingIndex}-${analyticsTypingContent}`}
                                     content={analyticsTypingContent}
                                     speed={10}
                                     skipTyping={skipTyping || skipTypingEffect}
@@ -327,6 +328,7 @@ const Message = ({
                           isSequentialTyping &&
                           currentTypingContent && (
                             <TypingAnimation
+                              key={`sequential-${currentTypingIndex}-${currentTypingContent}`}
                               content={currentTypingContent}
                               speed={30}
                               skipTyping={skipTyping || skipTypingEffect}
@@ -341,6 +343,7 @@ const Message = ({
                           content && (
                             <div className="chatbox__typing-step">
                               <TypingAnimation
+                                key={`final-${messageId}-${content}`}
                                 content={content}
                                 speed={15}
                                 skipTyping={skipTyping || skipTypingEffect}

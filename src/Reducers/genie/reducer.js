@@ -54,6 +54,8 @@ export const genieReducer = createSlice({
       state.chat.selectedMessages = [];
       state.chat.thumbsFeedback = {};
       state.chat.skipTypingEffect = false; // Reset skipTypingEffect flag
+      state.chat.hasPlayedFirstAudio = false; // Reset first audio flag
+      state.chat.aiResponseCount = 0; // Reset AI response counter
       idGenerator.reset();
     },
     // Handle thumbs up/down feedback

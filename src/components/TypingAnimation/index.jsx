@@ -1,39 +1,15 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { updateChat, updateSpeech, updateUI } from "Reducers/genie/reducer";
 import * as genieIcons from "../../assets/genieIcons";
 import { Howl } from "howler";
 
-/**
- * TypingAnimation Component
- *
- * A React component that provides a slow, visible word-by-word typewriter effect for displaying content with
- * automatic voice recognition activation after typing completion.
- *
- * Behavior:
- * 1. Shows typing animation for content word by word with deliberate timing
- * 2. Waits for typing to complete (minimum 800ms per word for visibility)
- * 3. Waits 1 second after typing finishes
- * 4. Plays listening audio sound using Howler.js
- * 5. Triggers voice recognition to start listening
- * 6. Scrolls to bottom smoothly when content is displayed
- *
- * Timing Features:
- * - Base delay: 500ms minimum per word for visibility
- * - Custom speed: Added to base delay for fine-tuning
- * - Word pauses: Additional delays between words for readability
- * - Natural rhythm: Creates engaging, readable typing animation
- *
- * @param {Object} props - Component props
- * @param {string} props.content - Text content to display with typing animation
- * @param {number} props.speed - Base speed of typing animation in milliseconds per word
- * @param {boolean} props.skipTyping - Whether to skip typing animation and show content immediately
- * @param {Function} props.onTypingComplete - Callback when typing animation completes
- * @param {string} props.className - Additional CSS class names for styling
- * @param {Function|React.ReactNode} props.children - Render prop function or React children
- * @param {React.RefObject} props.chatRef - Reference to chat container for scrolling
- * @returns {JSX.Element|null} The typing animation component or null if no content
- */
 const TypingAnimation = ({
   content,
   speed,
@@ -48,20 +24,27 @@ const TypingAnimation = ({
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const timeoutRef = useRef(null);
   const { chat, speech } = useSelector((state) => state.genie);
-  const { isVoiceMode } = speech;
+  const { isVoiceMode, isAudioMode } = speech;
   const dispatch = useDispatch();
   const hasTriggeredEnd = useRef(false);
   const listenAudioInstance = useRef(null);
+  const shouldIAudioInstance = useRef(null);
+  const gotItAudioInstance = useRef(null);
+  const doneAudioInstance = useRef(null);
+  const hereResultsAudioInstance = useRef(null);
+
+  // Check if this is the first AI response and audio hasn't been played yet
+  const shouldPlayFirstAudio = !chat.hasPlayedFirstAudio;
 
   // Split content into words for word-by-word typing
-  const words = content ? content.split(/\s+/) : [];
-  
+  const words = useMemo(() => (content ? content.split(/\s+/) : []), [content]);
+
   // Calculate typing speed with additional delay for better visibility
-  const typingSpeed = speed ? speed + 200 : 300; // Default 800ms per word if no speed provided
+  const baseTypingSpeed = speed ? speed + 300 : 500;
+  const [typingSpeed, setTypingSpeed] = useState(baseTypingSpeed);
 
   /**
    * Memoized function to update speech state in Redux
-   * @param {Object} data - Speech state data to update
    */
   const updateSpeechState = useCallback(
     (data) => dispatch(updateSpeech(data)),
@@ -70,15 +53,23 @@ const TypingAnimation = ({
 
   /**
    * Memoized function to update UI state in Redux
-   * @param {Object} data - UI state data to update
    */
   const updateUIState = useCallback(
     (data) => dispatch(updateUI(data)),
     [dispatch]
   );
 
-  // Initialize Howler audio instance for listen indicator
+  /**
+   * Memoized function to update chat state in Redux
+   */
+  const updateChatState = useCallback(
+    (data) => dispatch(updateChat(data)),
+    [dispatch]
+  );
+
+  // Initialize Howler audio instances
   useEffect(() => {
+    // Listen indicator audio
     if (genieIcons?.listenIndicator) {
       listenAudioInstance.current = new Howl({
         src: [genieIcons.listenIndicator],
@@ -93,18 +84,90 @@ const TypingAnimation = ({
       });
     }
 
+    // Should I audio for first typing
+    if (genieIcons?.shouldIAudio) {
+      shouldIAudioInstance.current = new Howl({
+        src: [genieIcons.shouldIAudio],
+        html5: true,
+        preload: true,
+        onloaderror: (id, error) => {
+          console.error("Should I audio load error:", error);
+        },
+        onerror: (id, error) => {
+          console.error("Should I audio error:", error);
+        },
+      });
+    }
+
+    // Got it audio for second typing
+    if (genieIcons?.gotItAudio) {
+      gotItAudioInstance.current = new Howl({
+        src: [genieIcons.gotItAudio],
+        html5: true,
+        preload: true,
+        onloaderror: (id, error) => {
+          console.error("Got it audio load error:", error);
+        },
+        onerror: (id, error) => {
+          console.error("Got it audio error:", error);
+        },
+      });
+    }
+
+    // Done audio for third typing
+    if (genieIcons?.doneAudio) {
+      doneAudioInstance.current = new Howl({
+        src: [genieIcons.doneAudio],
+        html5: true,
+        preload: true,
+        onloaderror: (id, error) => {
+          console.error("Done audio load error:", error);
+        },
+        onerror: (id, error) => {
+          console.error("Done audio error:", error);
+        },
+      });
+    }
+
+    if (genieIcons?.hereResultsAudio) {
+      hereResultsAudioInstance.current = new Howl({
+        src: [genieIcons?.hereResultsAudio],
+        html5: true,
+        preload: true,
+        onloaderror: (id, error) => {
+          console.error("Here are the audio error: ", error);
+        },
+        onerror: (id, error) => {
+          console.error("Here are the audio error: ", error);
+        },
+      });
+    }
     return () => {
       if (listenAudioInstance.current) {
         listenAudioInstance.current.stop();
         listenAudioInstance.current = null;
+      }
+      if (shouldIAudioInstance.current) {
+        shouldIAudioInstance.current.stop();
+        shouldIAudioInstance.current = null;
+      }
+      if (gotItAudioInstance.current) {
+        gotItAudioInstance.current.stop();
+        gotItAudioInstance.current = null;
+      }
+      if (doneAudioInstance.current) {
+        doneAudioInstance.current.stop();
+        doneAudioInstance.current = null;
+      }
+      if (hereResultsAudioInstance.current) {
+        hereResultsAudioInstance.current.stop();
+        hereResultsAudioInstance.current = null;
       }
     };
   }, []);
 
   /**
    * Play audio files using Howler.js
-   * @param {string} audioFile - Path to the audio file to play
-   * @returns {Promise<void>} Promise that resolves when audio starts playing
    */
   const playAudio = async (audioFile) => {
     try {
@@ -113,6 +176,26 @@ const TypingAnimation = ({
         listenAudioInstance.current
       ) {
         listenAudioInstance.current.play();
+      } else if (
+        audioFile === genieIcons?.shouldIAudio &&
+        shouldIAudioInstance.current
+      ) {
+        shouldIAudioInstance.current.play();
+      } else if (
+        audioFile === genieIcons?.gotItAudio &&
+        gotItAudioInstance.current
+      ) {
+        gotItAudioInstance.current.play();
+      } else if (
+        audioFile === genieIcons?.doneAudio &&
+        doneAudioInstance.current
+      ) {
+        doneAudioInstance.current.play();
+      } else if (
+        audioFile === genieIcons?.hereResultsAudio &&
+        hereResultsAudioInstance.current
+      ) {
+        hereResultsAudioInstance.current.play();
       } else {
         const howlInstance = new Howl({
           src: [audioFile],
@@ -142,7 +225,6 @@ const TypingAnimation = ({
 
   /**
    * Check if current message is at the last index
-   * @returns {boolean} True if at last index, false otherwise
    */
   const isLastIndex = () => {
     if (!selectedMessages || selectedMessages.length === 0) return false;
@@ -152,49 +234,28 @@ const TypingAnimation = ({
 
   // Handle content changes and typing initialization
   useEffect(() => {
-    if (!newChat || !content) {
-      setDisplayedContent(content || "");
+    if (!content) {
+      setDisplayedContent("");
       setIsTyping(false);
-      if (content || !newChat) {
-        onTypingComplete?.();
-        scrollToBottom();
-        if (!hasTriggeredEnd.current) {
-          hasTriggeredEnd.current = true;
-          // Only trigger voice search if NOT at the last index AND audio mode is enabled
-          if (!isLastIndex() && isVoiceMode) {
-            setTimeout(() => {
-              playAudio(genieIcons?.listenIndicator);
-
-              updateUIState({
-                typingEnd: true,
-              });
-              updateSpeechState({
-                inputVoiceSearch: true,
-                isListening: true,
-                listeningText: "Listening...",
-                wakeup: false,
-                transcript: "",
-              });
-            }, 1000);
-          }
-        }
-      }
+      setTypingSpeed(baseTypingSpeed);
       return;
     }
 
     if (skipTyping) {
       setDisplayedContent(content);
       setIsTyping(false);
+      setTypingSpeed(baseTypingSpeed);
       onTypingComplete?.();
-      // Scroll to bottom when content is displayed
       scrollToBottom();
       if (!hasTriggeredEnd.current) {
         hasTriggeredEnd.current = true;
         if (!isLastIndex() && isVoiceMode) {
+          debugger;
           setTimeout(() => {
-            // Play listen indicator audio using Howler.js
-            playAudio(genieIcons?.listenIndicator);
-
+            // Play listen indicator only if audio mode is enabled
+            if (isVoiceMode) {
+              playAudio(genieIcons?.listenIndicator);
+            }
             updateUIState({
               typingEnd: true,
             });
@@ -216,32 +277,69 @@ const TypingAnimation = ({
     setIsTyping(true);
     setCurrentWordIndex(0);
     hasTriggeredEnd.current = false;
+    setTypingSpeed(baseTypingSpeed);
 
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [content, speed, skipTyping, onTypingComplete, newChat]);
+  }, [content, speed, skipTyping, onTypingComplete, baseTypingSpeed]);
+
+  // Adjust typing speed for last index
+  useEffect(() => {
+    if (isLastIndex()) {
+      setTypingSpeed(baseTypingSpeed + 150);
+    } else {
+      setTypingSpeed(baseTypingSpeed);
+    }
+  }, [isLastIndex, baseTypingSpeed]);
 
   // Handle typing animation logic
   useEffect(() => {
     let animationTimeoutId;
 
-    if (isTyping && newChat && content) {
+    if (isTyping && content) {
       if (currentWordIndex < words.length) {
+        // Play audio based on AI response count (only if audio mode is enabled)
+        if (currentWordIndex === 0) {
+          if (shouldPlayFirstAudio) {
+            // First AI response - play shouldI audio if audio mode is enabled
+            if (isAudioMode) {
+              playAudio(genieIcons?.shouldIAudio);
+            }
+            updateChatState({
+              hasPlayedFirstAudio: true,
+              aiResponseCount: chat.aiResponseCount + 1,
+            });
+          } else if (chat.aiResponseCount === 1) {
+            // Second AI response - play gotIt audio if audio mode is enabled
+            if (isAudioMode) {
+              playAudio(genieIcons?.gotItAudio);
+            }
+            updateChatState({ aiResponseCount: chat.aiResponseCount + 1 });
+          } else if (chat.aiResponseCount === 2) {
+            // Third AI response - play done audio if audio mode is enabled
+            if (isAudioMode) {
+              playAudio(genieIcons?.doneAudio);
+            }
+            updateChatState({ aiResponseCount: chat.aiResponseCount + 1 });
+          } else if (chat.aiResponseCount < 10) {
+            // For subsequent responses, just increment the counter
+            updateChatState({ aiResponseCount: chat.aiResponseCount + 1 });
+          }
+        }
+
         animationTimeoutId = setTimeout(() => {
           setDisplayedContent((prev) => {
             const nextWord = words[currentWordIndex];
-            // Add space before word if it's not the first word
             const space = prev ? " " : "";
             return prev + space + nextWord;
           });
           setCurrentWordIndex((prev) => prev + 1);
         }, typingSpeed);
-        
+
         // Add a small pause between words for better readability
-        // This makes the word-by-word effect more pronounced
         if (currentWordIndex < words.length - 1) {
           setTimeout(() => {
             // Small pause between words
@@ -252,13 +350,19 @@ const TypingAnimation = ({
         onTypingComplete?.();
         scrollToBottom();
 
+        // Reset typing speed after animation completes
+        setTypingSpeed(baseTypingSpeed);
+
         if (!hasTriggeredEnd.current) {
           hasTriggeredEnd.current = true;
 
-          // Only trigger voice search if NOT at the last index AND audio mode is enabled
+          // Only trigger voice search if NOT at the last index AND voice mode is enabled
           if (!isLastIndex() && isVoiceMode) {
             setTimeout(() => {
-              playAudio(genieIcons?.listenIndicator);
+              // Play listen indicator only if audio mode is enabled
+              if (isAudioMode) {
+                playAudio(genieIcons?.listenIndicator);
+              }
 
               updateUIState({
                 typingEnd: true,
@@ -278,7 +382,7 @@ const TypingAnimation = ({
     return () => {
       clearTimeout(animationTimeoutId);
     };
-  }, [isTyping, currentWordIndex, words, newChat, speed, onTypingComplete]);
+  }, [isTyping, currentWordIndex, words, speed, onTypingComplete]);
 
   // Cleanup timeout references on unmount
   useEffect(() => {

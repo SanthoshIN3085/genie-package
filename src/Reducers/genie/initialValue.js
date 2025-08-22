@@ -13,6 +13,8 @@ export const initialState = {
     searchInputValue: "",
     thumbsFeedback: {}, // Store thumbs up/down state by messageId and itemIndex
     skipTypingEffect: false, // Add skipTypingEffect flag
+    hasPlayedFirstAudio: false, // Track if the first AI response audio has been played
+    aiResponseCount: 0, // Track the number of AI responses in the conversation
   },
   speech: {
     listeningText: "Listening...",

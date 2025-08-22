@@ -93,7 +93,7 @@ const VoiceRecognition = ({
 
   // 6. USE REFS MANAGEMENT
   const silenceTimerRef = useRef(null);
-  const SILENCE_LIMIT_MS = 3000;
+  const SILENCE_LIMIT_MS = 5000;
   const debounceDelay = 2000;
 
   // 7. PERFORMANCE OPTIMIZATION FUNCTIONS (useMemo, useCallback)
@@ -382,7 +382,6 @@ const VoiceRecognition = ({
         }
 
         onFormSubmit(processedTranscript);
-
 
         setValue("searchInput", "");
         resetTranscript();
