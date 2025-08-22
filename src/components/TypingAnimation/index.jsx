@@ -253,7 +253,7 @@ const TypingAnimation = ({
           debugger;
           setTimeout(() => {
             // Play listen indicator only if audio mode is enabled
-            if (isVoiceMode) {
+            if (isAudioMode) {
               playAudio(genieIcons?.listenIndicator);
             }
             updateUIState({

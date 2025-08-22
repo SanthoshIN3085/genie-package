@@ -24,6 +24,7 @@ export const initialState = {
     isAudioMode: false,
     wakeup: false,
     inputVoiceSearch: false,
+    transcript: "",
   },
   search: {
     searchInput: "",
