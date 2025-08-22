@@ -16,6 +16,9 @@ export const initialState = {
     hasPlayedFirstAudio: false, // Track if the first AI response audio has been played
     aiResponseCount: 0, // Track the number of AI responses in the conversation
   },
+  audio: {
+    TTS: null,
+  },
   speech: {
     listeningText: "Listening...",
     isListening: false,

@@ -28,10 +28,10 @@ const TypingAnimation = ({
   const dispatch = useDispatch();
   const hasTriggeredEnd = useRef(false);
   const listenAudioInstance = useRef(null);
-  const shouldIAudioInstance = useRef(null);
-  const gotItAudioInstance = useRef(null);
-  const doneAudioInstance = useRef(null);
-  const hereResultsAudioInstance = useRef(null);
+  const aiAudienceLoanResponse1AudioInstance = useRef(null);
+  const aiAudienceLoanResponse2AudioInstance = useRef(null);
+  const aiAudienceLoanResponse3AudioInstance = useRef(null);
+  const aiAudienceLoanResponse4AudioInstance = useRef(null);
 
   // Check if this is the first AI response and audio hasn't been played yet
   const shouldPlayFirstAudio = !chat.hasPlayedFirstAudio;
@@ -85,9 +85,9 @@ const TypingAnimation = ({
     }
 
     // Should I audio for first typing
-    if (genieIcons?.shouldIAudio) {
-      shouldIAudioInstance.current = new Howl({
-        src: [genieIcons.shouldIAudio],
+    if (genieIcons?.aiAudienceLoanResponse1Audio) {
+      aiAudienceLoanResponse1AudioInstance.current = new Howl({
+        src: [genieIcons.aiAudienceLoanResponse1Audio],
         html5: true,
         preload: true,
         onloaderror: (id, error) => {
@@ -100,9 +100,9 @@ const TypingAnimation = ({
     }
 
     // Got it audio for second typing
-    if (genieIcons?.gotItAudio) {
-      gotItAudioInstance.current = new Howl({
-        src: [genieIcons.gotItAudio],
+    if (genieIcons?.aiAudienceLoanResponse2Audio) {
+      aiAudienceLoanResponse2AudioInstance.current = new Howl({
+        src: [genieIcons.aiAudienceLoanResponse2Audio],
         html5: true,
         preload: true,
         onloaderror: (id, error) => {
@@ -115,9 +115,9 @@ const TypingAnimation = ({
     }
 
     // Done audio for third typing
-    if (genieIcons?.doneAudio) {
-      doneAudioInstance.current = new Howl({
-        src: [genieIcons.doneAudio],
+    if (genieIcons?.aiAudienceLoanResponse3Audio) {
+      aiAudienceLoanResponse3AudioInstance.current = new Howl({
+        src: [genieIcons.aiAudienceLoanResponse3Audio],
         html5: true,
         preload: true,
         onloaderror: (id, error) => {
@@ -129,9 +129,9 @@ const TypingAnimation = ({
       });
     }
 
-    if (genieIcons?.hereResultsAudio) {
-      hereResultsAudioInstance.current = new Howl({
-        src: [genieIcons?.hereResultsAudio],
+    if (genieIcons?.aiAudienceLoanResponse4Audio) {
+      aiAudienceLoanResponse4AudioInstance.current = new Howl({
+        src: [genieIcons?.aiAudienceLoanResponse4Audio],
         html5: true,
         preload: true,
         onloaderror: (id, error) => {
@@ -147,21 +147,21 @@ const TypingAnimation = ({
         listenAudioInstance.current.stop();
         listenAudioInstance.current = null;
       }
-      if (shouldIAudioInstance.current) {
-        shouldIAudioInstance.current.stop();
-        shouldIAudioInstance.current = null;
+      if (aiAudienceLoanResponse1AudioInstance.current) {
+        aiAudienceLoanResponse1AudioInstance.current.stop();
+        aiAudienceLoanResponse1AudioInstance.current = null;
       }
-      if (gotItAudioInstance.current) {
-        gotItAudioInstance.current.stop();
-        gotItAudioInstance.current = null;
+      if (aiAudienceLoanResponse2AudioInstance.current) {
+        aiAudienceLoanResponse2AudioInstance.current.stop();
+        aiAudienceLoanResponse2AudioInstance.current = null;
       }
-      if (doneAudioInstance.current) {
-        doneAudioInstance.current.stop();
-        doneAudioInstance.current = null;
+      if (aiAudienceLoanResponse3AudioInstance.current) {
+        aiAudienceLoanResponse3AudioInstance.current.stop();
+        aiAudienceLoanResponse3AudioInstance.current = null;
       }
-      if (hereResultsAudioInstance.current) {
-        hereResultsAudioInstance.current.stop();
-        hereResultsAudioInstance.current = null;
+      if (aiAudienceLoanResponse4AudioInstance.current) {
+        aiAudienceLoanResponse4AudioInstance.current.stop();
+        aiAudienceLoanResponse4AudioInstance.current = null;
       }
     };
   }, []);
@@ -177,25 +177,25 @@ const TypingAnimation = ({
       ) {
         listenAudioInstance.current.play();
       } else if (
-        audioFile === genieIcons?.shouldIAudio &&
-        shouldIAudioInstance.current
+        audioFile === genieIcons?.aiAudienceLoanResponse1Audio &&
+        aiAudienceLoanResponse1AudioInstance.current
       ) {
-        shouldIAudioInstance.current.play();
+        aiAudienceLoanResponse1AudioInstance.current.play();
       } else if (
-        audioFile === genieIcons?.gotItAudio &&
-        gotItAudioInstance.current
+        audioFile === genieIcons?.aiAudienceLoanResponse2Audio &&
+        aiAudienceLoanResponse2AudioInstance.current
       ) {
-        gotItAudioInstance.current.play();
+        aiAudienceLoanResponse2AudioInstance.current.play();
       } else if (
-        audioFile === genieIcons?.doneAudio &&
-        doneAudioInstance.current
+        audioFile === genieIcons?.aiAudienceLoanResponse3Audio &&
+        aiAudienceLoanResponse3AudioInstance.current
       ) {
-        doneAudioInstance.current.play();
+        aiAudienceLoanResponse3AudioInstance.current.play();
       } else if (
-        audioFile === genieIcons?.hereResultsAudio &&
-        hereResultsAudioInstance.current
+        audioFile === genieIcons?.aiAudienceLoanResponse4Audio &&
+        aiAudienceLoanResponse4AudioInstance.current
       ) {
-        hereResultsAudioInstance.current.play();
+        aiAudienceLoanResponse4AudioInstance.current.play();
       } else {
         const howlInstance = new Howl({
           src: [audioFile],
@@ -306,7 +306,7 @@ const TypingAnimation = ({
           if (shouldPlayFirstAudio) {
             // First AI response - play shouldI audio if audio mode is enabled
             if (isAudioMode) {
-              playAudio(genieIcons?.shouldIAudio);
+              playAudio(genieIcons?.aiAudienceLoanResponse1Audio);
             }
             updateChatState({
               hasPlayedFirstAudio: true,
@@ -315,13 +315,18 @@ const TypingAnimation = ({
           } else if (chat.aiResponseCount === 1) {
             // Second AI response - play gotIt audio if audio mode is enabled
             if (isAudioMode) {
-              playAudio(genieIcons?.gotItAudio);
+              playAudio(genieIcons?.aiAudienceLoanResponse2Audio);
             }
             updateChatState({ aiResponseCount: chat.aiResponseCount + 1 });
           } else if (chat.aiResponseCount === 2) {
             // Third AI response - play done audio if audio mode is enabled
             if (isAudioMode) {
-              playAudio(genieIcons?.doneAudio);
+              playAudio(genieIcons?.aiAudienceLoanResponse3Audio);
+            }
+            updateChatState({ aiResponseCount: chat.aiResponseCount + 1 });
+          } else if (chat.aiResponseCount === 6) {
+            if (isAudioMode) {
+              playAudio(genieIcons?.aiAudienceLoanResponse4Audio);
             }
             updateChatState({ aiResponseCount: chat.aiResponseCount + 1 });
           } else if (chat.aiResponseCount < 10) {

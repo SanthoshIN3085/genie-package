@@ -16,12 +16,18 @@ export const aiPrompt3 = "Provide reports of my campaigns over the last month";
 export const aiPrompt4 =
   "Fixed deposit interest page active. Push limited-time rates!";
 
-export const aiAudienceResponse1 =
-  "Should I include users who have recently interacted with loan-related content, applications, or campaigns?";
+export const aiAudienceResponse1 = `Do you want to filter based on engagement, such as website visits to loan pages?`;
 export const aiAudienceResponse2 =
-  "Got it! Would you like to prioritize high-intent users, like those who revisited loan pages multiple times?";
-export const aiAudienceResponse3 = `Done! The segment now includes actively interested loan seekers. Generate now?`;
-export const aiAudienceResponse4 = `Here are the segments tailored to your requirements:`;
+  "Should I enrich the segment with income range and employment type?";
+export const aiAudienceResponse3 = `Done. The segment includes potential loan seekers with enriched financial and employment details. Save it now?`;
+export const aiAudienceResponse4 = `Here's the`;
+
+// export const aiAudienceResponse1 =
+//   "Should I include users who have recently interacted with loan-related content, applications, or campaigns?";
+// export const aiAudienceResponse2 =
+//   "Got it! Would you like to prioritize high-intent users, like those who revisited loan pages multiple times?";
+// export const aiAudienceResponse3 = `Done! The segment now includes actively interested loan seekers. Generate now?`;
+// export const aiAudienceResponse4 = `Here are the segments tailored to your requirements:`;
 
 export const aiCommunicationResponse1 =
   "Should we personalize it based on loan types and highlight a simplified application process?";

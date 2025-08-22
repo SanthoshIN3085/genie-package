@@ -33,6 +33,12 @@ export const genieReducer = createSlice({
         ...payload,
       };
     },
+    updateAudio: (state, { payload }) => {
+      state.audio = {
+        ...state.audio,
+        ...payload,
+      };
+    },
     updateSearch: (state, { payload }) => {
       state.search = {
         ...state.search,
@@ -62,11 +68,11 @@ export const genieReducer = createSlice({
     updateThumbsFeedback: (state, { payload }) => {
       const { messageId, itemIndex, feedback } = payload;
       const key = `${messageId}-${itemIndex}`;
-      
-      if (feedback === 'up') {
-        state.chat.thumbsFeedback[key] = 'up';
-      } else if (feedback === 'down') {
-        state.chat.thumbsFeedback[key] = 'down';
+
+      if (feedback === "up") {
+        state.chat.thumbsFeedback[key] = "up";
+      } else if (feedback === "down") {
+        state.chat.thumbsFeedback[key] = "down";
       } else {
         delete state.chat.thumbsFeedback[key];
       }
@@ -85,6 +91,7 @@ export const {
   updateUI,
   updateChat,
   updateSpeech,
+  updateAudio,
   updateSearch,
   updateSettings,
   resetChat,
